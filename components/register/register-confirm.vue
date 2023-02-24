@@ -6,11 +6,12 @@
       <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('confirm-otp') }}</h2>
       <input
         class="bg-white text-gray-500 border rounded-2xl border-gray-200
-         py-2.5 px-4 text-base h-12 outline-orange-600 sm:w-96 w-full bg-gray-100 my-6"
+         py-2.5 px-4 text-base h-12 outline-orange-600 sm:w-96 w-full bg-gray-100 mt-6 mb-2"
         v-model="otp"
         placeholder="Enter OTP"
         type="text"
       >
+      <span @click="resendOtp" class="text-lg font-bold text-right mb-4 mr-4 text-orange-500 cursor-pointer">{{ $t('resend-otp') }}</span>
       <button
         @click="confirmRegister"
         class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
@@ -37,6 +38,11 @@ export default {
                 this.$routePush({register: undefined})
                 this.$store.dispatch('setUser', res)
             })
+        },
+        resendOtp() {
+          this.$axios.post('/users-permissions/resend_otp', {
+            phone: this.phone
+          })
         }
     }
 }
