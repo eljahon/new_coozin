@@ -4,7 +4,7 @@ export const state = () => ({
   login: false,
   register: false,
   burger: false,
-  food: false,
+  food: false, 
   monthNames: {
     "01": 'Yan',
     "02": 'Fer',
