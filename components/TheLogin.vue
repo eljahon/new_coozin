@@ -48,10 +48,13 @@
         type="text"
       >
       <span @click="resendOtp" class="text-lg font-bold text-right mb-4 mr-4 text-orange-500 cursor-pointer">{{ $t('resend-otp') }}</span>
-      <button
+      <input
         @click="submitLogin"
         class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
-      >Войти</button>
+        value="Войти"
+        type="button"
+        disabled
+      />
     </div>
     <div @click="$routePush({login: undefined})" class="login-background"></div>
   </div>
@@ -66,7 +69,8 @@ export default {
       login: {
         phone: '',
         otp: ''
-      }
+      },
+      disabled: false
     }
   },
   methods: {
@@ -76,12 +80,15 @@ export default {
           })
         },
     async submitLogin() {
+      this.disabled = true
       try {
-       const {data:{jwt}}= await this.$auth.loginWith('local', { data: this.login })
-        this.$auth.setUserToken(jwt)
-        await this.$routePush({login: undefined})
-        await this.$toast.success('success Login')
-        await this.$store.dispatch('cart/getCardList')
+        if (this.disabled) {
+          const {data:{jwt}}= await this.$auth.loginWith('local', { data: this.login })
+          this.$auth.setUserToken(jwt)
+          await this.$routePush({login: undefined})
+          await this.$toast.success('success Login')
+          await this.$store.dispatch('cart/getCardList')
+        }
       } catch (e) {
         console.log(e)
         this.$toast.error(e, {
@@ -89,6 +96,7 @@ export default {
           position: 'bottom-right',
         })
       }
+      this.disabled = false
     },
     handalePhone() {
       this.$routePush({login: 'otp'})
