@@ -67,20 +67,20 @@ export const actions = {
     };
     commit('SET_DAY', days)
   },
-  // async setUser ({commit}, res) {
-  //   try {
-  //     this.$auth.setUserToken(res.jwt)
-  //     // const info = await this.$axios.get('/users/me')
-  //     // this.$auth.setUser(info)
-  //     // this.$cookies.set('userInfo', info)
-  //     // return info;
-  //     console.log(this.$auth)
-  //   } catch (err) {
-  //   }
-  // },
-  // async Login ({commit, dispatch}, payload) {
-  //  return await dispatch('setUser', payload)
-  // },
+  async setUser ({commit}, res) {
+    try {
+      this.$auth.setUserToken(res.jwt)
+      const info = await this.$axios.get('/users/me')
+      this.$auth.setUser(info)
+      this.$cookies.set('userInfo', info)
+      return info;
+      console.log(this.$auth)
+    } catch (err) {
+    }
+  },
+  async Login ({commit, dispatch}, payload) {
+   return await dispatch('setUser', payload)
+  },
   set_location ({commit}, payload) {
     commit('SET_LOCATION', payload)
     this.$cookies.set('langlot', payload)
