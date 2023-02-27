@@ -34,7 +34,7 @@ export default {
       },
       userRoom: {
         username: "eljahon",
-        room: 1
+        room: 2
       },
       operator: {
         username: "operator",
@@ -42,7 +42,7 @@ export default {
       },
       operatorRoom: {
         username: "operator",
-        room: 1
+        room: 2
       },
       socket: null,
       messages: [],
@@ -75,7 +75,7 @@ export default {
           text: this.inputMessage,
           sender: 3780,
           receiver: 3824,
-          room: 1,
+          room: 2,
           seen: true
         })
         this.inputMessage = ''

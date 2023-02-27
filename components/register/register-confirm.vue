@@ -15,6 +15,8 @@
       <button
         @click="confirmRegister"
         class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
+        :class="!otp.length || disabled ? 'opacity-70' : ''"
+        :disabled="!otp.length || disabled"
       >Войти</button>
     </div>
 </template>
@@ -26,17 +28,23 @@ export default {
     props: ['phone'],
     data() {
         return {
-            otp: ''
+            otp: '',
+            disabled: false
         }
     },
     methods: {
         confirmRegister() {
+          this.disabled = true
             this.$axios.post('/users-permissions/register_confirm_otp', {
                 phone: this.phone,
                 otp: this.otp
             }).then(res => {
                 this.$routePush({register: undefined})
                 this.$store.dispatch('setUser', res)
+            }).catch(err => {
+              setTimeout(() => {
+                this.disabled = false
+              }, 2000)
             })
         },
         resendOtp() {

@@ -4,9 +4,14 @@
       <div @click="$router.push({path: localePath($route.path), query: {...$route.query,login: undefined, register: undefined}})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
-      <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('login-account') }}</h2>
+      <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('registration') }}</h2>
       <p class="text-lg text-center text-gray-700 mt-1">{{ $t('have-account') }}
-        <span @click="$router.push({path: localePath($route.path), query: {...$route.query,login: 'login', register: undefined}})" class="text-orange-600 cursor-pointer font-semibold">{{ $t('login') }}</span>
+        <span 
+          @click="$router.push({path: localePath($route.path), query: {...$route.query,login: 'login', register: undefined}})" 
+          class="text-orange-600 cursor-pointer font-semibold"
+        >
+          {{ $t('login-account') }}
+        </span>
       </p>
         <div v-if="$route.query.register == 'register'" class="flex flex-col">
           <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
@@ -57,10 +62,17 @@
               v-model="register.phone"
               type="text"
               :class="errors.length > 0? 'border-red-400' :''"
-              placeholder="Введите номер телефона +998XX XXX XX XX"
+              :placeholder="$t('enter-phone-or-email')"
             >
             </ValidationProvider>
-            <button class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold" type="submit">{{ $t('continue') }}</button>
+            <button 
+              class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
+              :class="disable ? 'opacity-70' : ''"
+              type="submit"
+              :disabled="disable"
+            >
+              {{ $t('continue') }}
+            </button>
           </form>
           </ValidationObserver>
         </div>
@@ -84,11 +96,18 @@ export default {
         first_name: '',
         last_name: '',
         phone: ''
-      }
+      },
+      disabled: false
+    }
+  },
+  computed: {
+    disable() {
+      return !this.register.first_name || !this.register.last_name || !this.register.phone || this.disabled
     }
   },
   methods: {
     async funcRegister() {
+      this.disabled = true
        try {
          let data = await this.$axios.post('/users-permissions/register_otp', this.register);
          if (data.status) {
@@ -96,6 +115,9 @@ export default {
            this.$toast.success('You are success register')
          }
        } catch (err) {
+        setTimeout(() => {
+          this.disabled = false
+        }, 2000)
        }
       },
     toLogin() {

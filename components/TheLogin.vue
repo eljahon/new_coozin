@@ -20,7 +20,7 @@
               name="phone"
               class="block bg-white text-gray-500 border rounded-2xl border-gray-200 py-2.5 px-4 text-base h-12 outline-orange-600 sm:w-96 w-full bg-gray-100 my-4 m-auto"
               v-model="login.phone"
-              placeholder="номер телефона +9989 XXX XX XX"
+              :placeholder="$t('enter-phone-or-email')"
               :state="errors[0] ? false : valid ? true : null"
               :class="errors.length > 0 ? 'border-red-700': ''"
               type="text"
@@ -51,9 +51,10 @@
       <input
         @click="submitLogin"
         class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
+        :class="!login.otp.length || disabled ? 'opacity-70' : ''"
         value="Войти"
         type="button"
-        disabled
+        :disabled="!login.otp.length || disabled"
       />
     </div>
     <div @click="$routePush({login: undefined})" class="login-background"></div>
@@ -95,8 +96,10 @@ export default {
           duration: 2000,
           position: 'bottom-right',
         })
+        setTimeout(() => {
+          this.disabled = false
+        }, 2000)
       }
-      this.disabled = false
     },
     handalePhone() {
       this.$routePush({login: 'otp'})
