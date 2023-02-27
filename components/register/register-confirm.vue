@@ -1,5 +1,5 @@
 <template>
-    <div v-if="$route.query.register === 'otp'" class="login-modal">
+    <div v-if="$store.state.confirmRegisterModal" class="login-modal">
       <div @click="$routePush({register: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
@@ -11,7 +11,19 @@
         placeholder="Enter OTP"
         type="text"
       >
-      <span @click="resendOtp" class="text-lg font-bold text-right mb-4 mr-4 text-orange-500 cursor-pointer">{{ $t('resend-otp') }}</span>
+       <div class="flex items-center justify-between mb-4">
+          <span v-if="count">
+            {{ timer + count }}
+          </span>
+          <span></span>
+          <span 
+            @click="resendOtp" 
+            class="text-lg font-bold text-right text-orange-500"
+            :class="count ? 'cursor-wait' : 'cursor-pointer'"
+          >
+            {{ $t('resend-otp') }}
+          </span>
+       </div>
       <button
         @click="confirmRegister"
         class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
@@ -25,33 +37,52 @@
 <script>
 
 export default {
-    props: ['phone'],
+    props: ['data'],
     data() {
         return {
             otp: '',
-            disabled: false
+            disabled: false,
+            count: 0,
+            timer: '00:'
         }
     },
     methods: {
-        confirmRegister() {
+        async confirmRegister() {
           this.disabled = true
-            this.$axios.post('/users-permissions/register_confirm_otp', {
-                phone: this.phone,
+          try {
+            const { data: { jwt } } = await this.$axios.post('/users-permissions/register_confirm_otp', {
+                phone: this.data.phone,
                 otp: this.otp
-            }).then(res => {
-                this.$routePush({register: undefined})
-                this.$store.dispatch('setUser', res)
-            }).catch(err => {
-              setTimeout(() => {
-                this.disabled = false
-              }, 2000)
-            })
+            });
+            await this.$auth.setUserToken(jwt)
+            await this.$store.commit('CONFIRM_MODAL', false)
+          } catch(e) {
+            this.disabled = false
+          }
         },
-        resendOtp() {
-          this.$axios.post('/users-permissions/resend_otp', {
-            phone: this.phone
-          })
+        async resendOtp() {
+          try {
+            if (this.count == 0) {
+              await this.$axios.post('/users-permissions/register_otp', this.data)
+              this.count = 59;
+              let time = setInterval(() => {
+                if (this.count > 0 && 10 >= this.count) {
+                  this.timer = '00:0'
+                  this.count--
+                } else if (this.count > 0) {
+                  this.count--
+                } else {
+                  if (this.count === 0) {
+                    clearInterval(time)
+                  }
+                }
+              }, 1000)
+            }
+          } catch (e) {}
         }
+    },
+    mounted() {
+      console.log(this.$store.state.confirmRegisterModal, 'hello');
     }
 }
 

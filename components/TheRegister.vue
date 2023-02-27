@@ -76,7 +76,7 @@
           </form>
           </ValidationObserver>
         </div>
-        <register-confirm :phone="register.phone"></register-confirm>
+        <register-confirm :data="register"></register-confirm>
     </div>
     <div @click="$router.push({path: localePath($route.path), query: {...$route.query, register: undefined}})" class="register-background"></div>
   </div>
@@ -109,11 +109,10 @@ export default {
     async funcRegister() {
       this.disabled = true
        try {
-         let data = await this.$axios.post('/users-permissions/register_otp', this.register);
-         if (data.status) {
-           this.$routePush({...this.$route.query, register: 'otp'})
-           this.$toast.success('You are success register')
-         }
+          await this.$axios.post('/users-permissions/register_otp', this.register);
+          await this.$routePush({register: undefined})
+          await this.$store.commit('CONFIRM_MODAL', true)
+          await this.$toast.success('You are success register')
        } catch (err) {
         setTimeout(() => {
           this.disabled = false

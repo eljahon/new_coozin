@@ -138,7 +138,7 @@
     <the-login/>
 
     <!--  Register  -->
-    <the-register :hide="$store.state.register"/>
+    <the-register/>
 
     <!--  Order Modal  -->
     <the-modal />

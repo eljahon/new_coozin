@@ -34,7 +34,7 @@
       </ValidationObserver>
       <!--         <login-phone/>-->
     </div>
-    <div v-else-if="$route.query.login === 'otp'" class="login-modal">
+    <div v-else-if="$store.state.confirmLoginModal" class="login-modal">
       <div @click="$routePush({login: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
@@ -84,7 +84,7 @@ export default {
       this.disabled = true
       try {
         if (this.disabled) {
-          const {data:{jwt}}= await this.$auth.loginWith('local', { data: this.login })
+          const {data: { jwt }}= await this.$auth.loginWith('local', { data: this.login })
           this.$auth.setUserToken(jwt)
           await this.$routePush({login: undefined})
           await this.$toast.success('success Login')
@@ -101,16 +101,15 @@ export default {
         }, 2000)
       }
     },
-    handalePhone() {
-      this.$routePush({login: 'otp'})
-      this.$axios.post('/users-permissions/send_otp', {
-        phone: this.login.phone
-      })
+    async handalePhone() {
+      try {
+        await this.$axios.post('/users-permissions/send_otp', {
+          phone: this.login.phone
+        })
+        await this.$routePush({login: undefined})
+        await this.$store.commit('CONFIRM_LOGIN_MODAL', true)
+      } catch (e) {}
     },
-    toRegister() {
-      this.$store.dispatch('loginModal', false)
-      this.$store.dispatch('registerModal', true)
-    }
   }
 }
 </script>
