@@ -1,7 +1,7 @@
 <template>
   <div v-if="$route.query.register">
     <div class="register-modal">
-      <div @click="$router.push({path: localePath($route.path), query: {...$route.query,login: undefined, register: undefined}})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
+      <div @click="close" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
       <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('registration') }}</h2>
@@ -59,8 +59,9 @@
             <input
               class="bg-white text-gray-500 border rounded-2xl border-gray-200
                py-2.5 px-4 text-base h-12 outline-orange-600 sm:w-96 w-full bg-gray-100 mb-4"
-              v-model="register.phone"
+              v-model.trim="phone"
               type="text"
+              @input="checkPhone"
               :class="errors.length > 0? 'border-red-400' :''"
               :placeholder="$t('enter-phone-or-email')"
             >
@@ -80,7 +81,7 @@
           <register-confirm :data="register" @confirm="confirm"></register-confirm>
         </div>
     </div>
-    <div @click="$router.push({path: localePath($route.path), query: {...$route.query, register: undefined}})" class="register-background"></div>
+    <div @click="close" class="register-background"></div>
   </div>
 </template>
 
@@ -99,6 +100,7 @@ export default {
         last_name: '',
         phone: ''
       },
+      phone: '',
       disabled: false,
       isRegister: true
     }
@@ -109,6 +111,19 @@ export default {
     }
   },
   methods: {
+    close() {
+      this.$router.push({path: this.localePath(this.$route.path), query: {...this.$route.query, register: undefined}})
+      this.isRegister = true
+      this.register = {}
+      this.phone = ''
+    },
+    checkPhone(e) {
+      let el = e.target.value.trim()
+      if (el.length > 0 && el[0] !== '+') {
+        this.phone = '+998' + this.phone
+      }
+      this.register.phone = this.phone
+    },
     async funcRegister() {
       this.disabled = true
        try {
@@ -121,12 +136,10 @@ export default {
         }, 2000)
        }
       },
-    toLogin() {
-      this.$store.dispatch('registerModal', false)
-      this.$store.dispatch('loginModal', true)
-    },
     confirm() {
       this.isRegister = true
+      this.register = {}
+      this.phone = ''
     }
   },
 }

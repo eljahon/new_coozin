@@ -83,9 +83,6 @@ export default {
           } catch (e) {}
         }
     },
-    mounted() {
-      console.log(this.$store.state.confirmRegisterModal, 'hello');
-    }
 }
 
 </script>

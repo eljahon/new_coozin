@@ -1,7 +1,7 @@
 <template>
   <div v-if="$route.query.login === 'login'" class="login">
     <div v-if="isLogin" class="login-modal">
-      <div @click="$routePush({login: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
+      <div @click="close" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
       <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('login-account') }}</h2>
@@ -19,7 +19,8 @@
             <input
               name="phone"
               class="block bg-white text-gray-500 border rounded-2xl border-gray-200 py-2.5 px-4 text-base h-12 outline-orange-600 sm:w-96 w-full bg-gray-100 my-4 m-auto"
-              v-model="login.phone"
+              v-model.trim="phone"
+              @input="checkPhone"
               :placeholder="$t('enter-phone-or-email')"
               :state="errors[0] ? false : valid ? true : null"
               :class="errors.length > 0 ? 'border-red-700': ''"
@@ -47,7 +48,19 @@
         placeholder="Enter OTP"
         type="text"
       >
-      <span @click="resendOtp" class="text-lg font-bold text-right mb-4 mr-4 text-orange-500 cursor-pointer">{{ $t('resend-otp') }}</span>
+      <div class="flex items-center justify-between mb-4">
+          <span v-if="count">
+            {{ timer + count }}
+          </span>
+          <span></span>
+          <span 
+            @click="resendOtp" 
+            class="text-lg font-bold text-right text-orange-500"
+            :class="count ? 'cursor-wait' : 'cursor-pointer'"
+          >
+            {{ $t('resend-otp') }}
+          </span>
+       </div>
       <input
         @click="submitLogin"
         class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
@@ -57,7 +70,7 @@
         :disabled="!login.otp.length || disabled"
       />
     </div>
-    <div @click="$routePush({login: undefined})" class="login-background"></div>
+    <div @click="close" class="login-background"></div>
   </div>
 </template>
 
@@ -68,6 +81,9 @@ export default {
   data() {
     return {
       isLogin: true,
+      phone: '',
+      timer: '00:',
+      count: 0,
       login: {
         phone: '',
         otp: ''
@@ -76,11 +92,28 @@ export default {
     }
   },
   methods: {
-    resendOtp() {
-          this.$axios.post('/users-permissions/resend_otp', {
+    async resendOtp() {
+      try {
+        if (this.count == 0) {
+          await this.$axios.post('/users-permissions/resend_otp', {
             phone: this.login.phone
           })
-        },
+          this.count = 59;
+          let time = setInterval(() => {
+            if (this.count > 0 && 10 >= this.count) {
+              this.timer = '00:0'
+              this.count--
+            } else if (this.count > 0) {
+              this.count--
+            } else {
+              if (this.count === 0) {
+                clearInterval(time)
+              }
+            }
+          }, 1000)
+        }
+      } catch (e) {}
+    },
     async submitLogin() {
       this.disabled = true
       try {
@@ -111,6 +144,19 @@ export default {
         this.isLogin = false
       } catch (e) {}
     },
+    close() {
+      this.$routePush({login: undefined})
+      this.isLogin = true
+      this.login.otp = ''
+      this.phone = ''
+    },
+    checkPhone(e) {
+      let el = e.target.value.trim()
+      if (el.length > 0 && el[0] !== '+') {
+        this.phone = '+998' + this.phone
+      }
+      this.login.phone = this.phone
+    }
   }
 }
 </script>
