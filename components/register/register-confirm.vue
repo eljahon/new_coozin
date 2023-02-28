@@ -1,5 +1,5 @@
 <template>
-    <div v-if="$store.state.confirmRegisterModal" class="login-modal">
+    <div class="login-modal">
       <div @click="$routePush({register: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
@@ -55,7 +55,9 @@ export default {
                 otp: this.otp
             });
             await this.$auth.setUserToken(jwt)
-            await this.$store.commit('CONFIRM_MODAL', false)
+            await this.$emit('confirm')
+            await this.$routePush({ register: undefined })
+            
           } catch(e) {
             this.disabled = false
           }

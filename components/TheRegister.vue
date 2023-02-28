@@ -13,7 +13,7 @@
           {{ $t('login-account') }}
         </span>
       </p>
-        <div v-if="$route.query.register == 'register'" class="flex flex-col">
+        <div v-if="isRegister" class="flex flex-col">
           <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
           <form novalidate class="sm:w-96 w-full" @submit.prevent="handleSubmit(funcRegister)">
             <ValidationProvider
@@ -76,7 +76,9 @@
           </form>
           </ValidationObserver>
         </div>
-        <register-confirm :data="register"></register-confirm>
+        <div v-else>
+          <register-confirm :data="register" @confirm="confirm"></register-confirm>
+        </div>
     </div>
     <div @click="$router.push({path: localePath($route.path), query: {...$route.query, register: undefined}})" class="register-background"></div>
   </div>
@@ -97,7 +99,8 @@ export default {
         last_name: '',
         phone: ''
       },
-      disabled: false
+      disabled: false,
+      isRegister: true
     }
   },
   computed: {
@@ -110,8 +113,7 @@ export default {
       this.disabled = true
        try {
           await this.$axios.post('/users-permissions/register_otp', this.register);
-          await this.$routePush({register: undefined})
-          await this.$store.commit('CONFIRM_MODAL', true)
+          this.isRegister = false
           await this.$toast.success('You are success register')
        } catch (err) {
         setTimeout(() => {
@@ -122,6 +124,9 @@ export default {
     toLogin() {
       this.$store.dispatch('registerModal', false)
       this.$store.dispatch('loginModal', true)
+    },
+    confirm() {
+      this.isRegister = true
     }
   },
 }

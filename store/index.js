@@ -5,8 +5,6 @@ export const state = () => ({
   register: false,
   burger: false,
   food: false,
-  confirmRegisterModal: false,
-  confirmLoginModal: false,
   monthNames: {
     "01": 'Yan',
     "02": 'Fer',
@@ -25,14 +23,6 @@ export const state = () => ({
   locatinsName: null,
 });
 export const mutations = {
-  CONFIRM_MODAL: (state, paylaod) => {
-    state.confirmRegisterModal = paylaod
-    // console.log(state.confirmRegisterModal);
-  },
-  CONFIRM_LOGIN_MODAL: (state, paylaod) => {
-    state.confirmLoginModal = paylaod
-    // console.log(state.confirmRegisterModal);
-  },
   SET_USER: (state, payload) => {
     state.userList = payload;
   },

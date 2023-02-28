@@ -1,6 +1,6 @@
 <template>
-  <div v-if="$route.query.login" class="login">
-    <div v-if="$route.query.login === 'login'" class="login-modal">
+  <div v-if="$route.query.login === 'login'" class="login">
+    <div v-if="isLogin" class="login-modal">
       <div @click="$routePush({login: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
@@ -34,7 +34,7 @@
       </ValidationObserver>
       <!--         <login-phone/>-->
     </div>
-    <div v-else-if="$store.state.confirmLoginModal" class="login-modal">
+    <div v-else class="login-modal">
       <div @click="$routePush({login: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
@@ -67,6 +67,7 @@ export default {
   components: {LoginPhone},
   data() {
     return {
+      isLogin: true,
       login: {
         phone: '',
         otp: ''
@@ -86,6 +87,7 @@ export default {
         if (this.disabled) {
           const {data: { jwt }}= await this.$auth.loginWith('local', { data: this.login })
           this.$auth.setUserToken(jwt)
+          this.isLogin = true
           await this.$routePush({login: undefined})
           await this.$toast.success('success Login')
           await this.$store.dispatch('cart/getCardList')
@@ -106,8 +108,7 @@ export default {
         await this.$axios.post('/users-permissions/send_otp', {
           phone: this.login.phone
         })
-        await this.$routePush({login: undefined})
-        await this.$store.commit('CONFIRM_LOGIN_MODAL', true)
+        this.isLogin = false
       } catch (e) {}
     },
   }
