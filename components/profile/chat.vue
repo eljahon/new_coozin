@@ -134,7 +134,7 @@ export default {
           room: this.roomId
         });
         this.socket.on('joinedRoom', message => {
-          console.log('joinedRoom: ', message)
+          console.log(message)
         })
         this.socket.on('message', res => {
           this.messages.push(res)
@@ -143,39 +143,37 @@ export default {
         this.roomOpen = true
       } else if (!this.roomOpen) {
         this.socket.emit('joinRoom', {
-          username: this.user.firstname,
+          username: this.user.username,
           room: this.roomId
         });
-        this.socket.on('joinedRoom', message => console.log(message));
+        this.socket.on(message => console.log(message));
         this.socket.on('message', message => {
           this.messages.push(message)
           console.log(message);
         })
         this.roomOpen = true
-        console.log("joinRoom");
-        console.log('joinedRoom');
       }
 
-      if (this.inputMessage.length) {
-        this.socket.emit("sendMessage", {
-          text: this.inputMessage,
-          sender: this.user.id,
-          receiver: 3824,
-          room: this.roomId,
-          seen: true
-        })
-        let message = {
-          sender: {
-            id: this.user.id,
-          },
-          text: this.inputMessage
-        }
-        this.messages.push(message)
-        this.$nextTick(() => {
-          this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
-        })
-        this.inputMessage = ''
-      }
+      // if (this.inputMessage.length) {
+      //   this.socket.emit("sendMessage", {
+      //     text: this.inputMessage,
+      //     sender: this.user.id,
+      //     receiver: 3824,
+      //     room: this.roomId,
+      //     seen: true
+      //   })
+      //   let message = {
+      //     sender: {
+      //       id: this.user.id,
+      //     },
+      //     text: this.inputMessage
+      //   }
+      //   this.messages.push(message)
+      //   this.$nextTick(() => {
+      //     this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
+      //   })
+      //   this.inputMessage = ''
+      // }
     },
     
   },
@@ -184,6 +182,7 @@ export default {
       username: this.user.username,
       user_id: this.user.id
     })
+    this.socket.on('left', res => console.log(res))
     this.socket.emit('leaveRoom', {
       username: this.user.username,
       room: this.roomId
