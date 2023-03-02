@@ -5,11 +5,14 @@
       <h4 class="text-center text-sm text-gray-600">Октябрь 16</h4>
       <div class="flex flex-col justify-between h-96 py-4">
         <div class="flex flex-col justify-between h-full">
-          <div class="flex flex-col justify-between py-4 overflow-y-scroll pr-5 pb-10">
+          <div 
+            class="flex flex-col justify-between py-4 overflow-y-scroll pr-5 pb-10"
+            ref="chat"
+          >
             <div
               v-for="message in messages"
               :key="message.id"
-              :class="message.sender.id == $auth.user.id ? 'operator' : 'user'"
+              :class="message.sender.id == $auth.user.id ? 'user' : 'operator'"
             >
               {{ message.text }}
             </div>
@@ -46,18 +49,40 @@ export default {
       socket: null,
       messages: [],
       inputMessage: '',
+      roomOpen: false
     }
   },
-  mounted() {
+  async mounted() {
     this.user = this.$auth.state.user
-    this.socket = io('https://testbackend.coozin.uz/')
-    this.socket.emit('join', this.user);
-    this.socket.on('joined', message => console.log(message));
-    this.getMessages()
-    this.getRooms()
+    this.socket = await io('https://testbackend.coozin.uz/')
+    await this.socket.emit('join', {
+      username: this.user.username,
+      user_id: this.user.id
+    });
+    await this.socket.on('joined', message => console.log("Joined: ", message));
+    await this.getRooms()
+    await this.getMessages()
+    this.$nextTick(() => {
+      this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
+    })
     console.log(this.user);
   },
   methods: {
+    async getRooms() {
+      try {
+        const {data: { results }} = await this.$axios.get('chatrooms', {
+          params: {
+            populate: {
+              sender: true
+            }
+          }
+        })
+        const index = results.findIndex(el => el.sender.id === this.user.id)
+        this.roomId = index >= 0 ? results[index].id : 0 
+      } catch(err) {
+        console.log(err);
+      }
+    },
     async getMessages() {
       try {
         const { data: { results } } = await this.$axios.get('chatmessages', {
@@ -91,46 +116,63 @@ export default {
           }
         })
         this.messages = results
-        console.log(results);
-      } catch(err) {
-        console.log(err);
-      }
-    },
-    async getRooms() {
-      try {
-        const {data: { results }} = await this.$axios.get('chatrooms', {
-          params: {
-            populate: {
-              sender: true
-            }
-          }
-        })
-        const index = results.findIndex(el => el.sender.id === this.user.id)
-        this.roomId = index >= 0 ? results[index].id : 0 
       } catch(err) {
         console.log(err);
       }
     },
     sendMessage() {
+      console.log("Room id: ", this.roomId);
       if (!this.roomId && this.inputMessage.length) {
+        console.log("Room created");
         this.socket.emit('createRoom', {
           sender: this.user.id,
           receiver: 3824,
           branch: 1
         })
-        this.socket.emit('joinRoom', this.userRoom);
-        this.socket.on('joinedRoom', message => console.log(message));
-        this.socket.on('message', message => console.log(message));
+        this.socket.emit('joinRoom', {
+          username: this.user.username,
+          room: this.roomId
+        });
+        this.socket.on('joinedRoom', message => {
+          console.log('joinedRoom: ', message)
+        })
+        this.socket.on('message', res => {
+          this.messages.push(res)
+          console.log('message', res);
+        })
         this.roomOpen = true
+      } else if (!this.roomOpen) {
+        this.socket.emit('joinRoom', {
+          username: this.user.firstname,
+          room: this.roomId
+        });
+        this.socket.on('joinedRoom', message => console.log(message));
+        this.socket.on('message', message => {
+          this.messages.push(message)
+          console.log(message);
+        })
+        this.roomOpen = true
+        console.log("joinRoom");
+        console.log('joinedRoom');
       }
 
       if (this.inputMessage.length) {
         this.socket.emit("sendMessage", {
           text: this.inputMessage,
-          sender: 3780,
+          sender: this.user.id,
           receiver: 3824,
-          room: 2,
+          room: this.roomId,
           seen: true
+        })
+        let message = {
+          sender: {
+            id: this.user.id,
+          },
+          text: this.inputMessage
+        }
+        this.messages.push(message)
+        this.$nextTick(() => {
+          this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
         })
         this.inputMessage = ''
       }
@@ -138,8 +180,14 @@ export default {
     
   },
   beforeDestroy () {
-    this.socket.emit('leave', this.userRoom)
-    this.socket.emit('leaveRoom', this.operatorRoom)
+    this.socket.emit('leave', {
+      username: this.user.username,
+      user_id: this.user.id
+    })
+    this.socket.emit('leaveRoom', {
+      username: this.user.username,
+      room: this.roomId
+    })
     this.socket.disconnect()
   }
 }
