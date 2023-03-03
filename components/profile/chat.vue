@@ -11,8 +11,8 @@
           >
             <div
               v-for="message in messages"
-              :key="message.id"
-              :class="message.sender.id == $auth.user.id ? 'user' : 'operator'"
+              :key="message?.id"
+              :class="message.sender?.id == $auth.user?.id ? 'user' : 'operator'"
             >
               {{ message.text }}
             </div>
@@ -41,11 +41,9 @@
 import io from 'socket.io-client'
 
 export default {
-  name: "",
+  name: "chat_pages",
   data() {
     return {
-      user: null,
-      roomId: 0,
       socket: null,
       messages: [],
       inputMessage: '',
@@ -53,19 +51,16 @@ export default {
     }
   },
   async mounted() {
-    this.user = this.$auth.state.user
     this.socket = await io('https://testbackend.coozin.uz/')
     await this.socket.emit('join', {
-      username: this.user.username,
-      user_id: this.user.id
+      username: this.$auth.user.username,
+      user_id: this.$auth.user.id
     });
     await this.socket.on('joined', message => console.log("Joined: ", message));
+    await this.getOperator()
     await this.getRooms()
     await this.getMessages()
-    this.$nextTick(() => {
-      this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
-    })
-    console.log(this.user);
+    await this.chatToBottom()
   },
   methods: {
     async getRooms() {
@@ -77,10 +72,11 @@ export default {
             }
           }
         })
-        const index = results.findIndex(el => el.sender.id === this.user.id)
-        this.roomId = index >= 0 ? results[index].id : 0 
+        const index = results.findIndex(el => el.sender.id === this.$auth.user.id)
+        const id = index >= 0 ? results[index].id : 0 
+        this.$routePush({ ...this.$route.query, room_id: id })
       } catch(err) {
-        console.log(err);
+        console.log(err)
       }
     },
     async getMessages() {
@@ -107,7 +103,7 @@ export default {
             },
             filters: {
               room: {
-                id: this.roomId
+                id: +this.$route.query.room_id
               }
             },
             sort: [
@@ -120,73 +116,104 @@ export default {
         console.log(err);
       }
     },
-    sendMessage() {
-      console.log("Room id: ", this.roomId);
-      if (!this.roomId && this.inputMessage.length) {
-        console.log("Room created");
-        this.socket.emit('createRoom', {
-          sender: this.user.id,
-          receiver: 3824,
+    async createRoom() {
+      try {
+        await this.socket.emit('createRoom', {
+          sender: +this.$route.query.user_id,
+          receiver: +this.$route.query.operator,
           branch: 1
         })
-        this.socket.emit('joinRoom', {
-          username: this.user.username,
-          room: this.roomId
+      } catch(err) {
+        console.log(err);
+      }
+    },
+    async joinRoom() {
+      try {
+        await this.socket.emit('joinRoom', {
+          username: this.$auth.user.username,
+          room: +this.$route.query.room_id
         });
-        this.socket.on('joinedRoom', message => {
+        await this.socket.on('joinedRoom', message => {
           console.log(message)
         })
+      } catch(err) {
+        console.log(err);
+      }
+    },
+    async listenMessage() {
+      try {
         this.socket.on('message', res => {
-          this.messages.push(res)
+          this.messages.push(res.data)
           console.log('message', res);
         })
+      } catch (err) {
+        console.log(err)
+      }
+    },
+    async sendMessage() {
+      // Create Room
+      if (!+this.$route.query.room_id && this.inputMessage.length) {
+        await this.createRoom()
+        await this.getRooms()
+        await this.joinRoom()
+        await this.listenMessage()
         this.roomOpen = true
-      } else if (!this.roomOpen) {
-        this.socket.emit('joinRoom', {
-          username: this.user.username,
-          room: this.roomId
-        });
-        this.socket.on(message => console.log(message));
-        this.socket.on('message', message => {
-          this.messages.push(message)
-          console.log(message);
-        })
+      }
+      // Open romm
+      else if (!this.roomOpen) {
+        await this.joinRoom()
+        await this.socket.on(message => console.log(message))
+        await this.listenMessage()
         this.roomOpen = true
       }
 
-      // if (this.inputMessage.length) {
-      //   this.socket.emit("sendMessage", {
-      //     text: this.inputMessage,
-      //     sender: this.user.id,
-      //     receiver: 3824,
-      //     room: this.roomId,
-      //     seen: true
-      //   })
-      //   let message = {
-      //     sender: {
-      //       id: this.user.id,
-      //     },
-      //     text: this.inputMessage
-      //   }
-      //   this.messages.push(message)
-      //   this.$nextTick(() => {
-      //     this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
-      //   })
-      //   this.inputMessage = ''
-      // }
+      // Send Message
+      if (this.inputMessage.length) {
+        await this.socket.emit("sendMessage", {
+          text: this.inputMessage,
+          sender: +this.$route.query.user_id,
+          receiver: this.$route.query.operator,
+          room: +this.$route.query.room_id,
+          seen: true
+        })
+
+        await this.chatToBottom()
+
+        this.inputMessage = await ''
+      }
     },
-    
+    chatToBottom() {
+      this.$nextTick(() => {
+        this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
+      })
+    },
+    async getOperator() {
+      try {
+        const {data:{users}} = await this.$axios.get('users', {
+          params: {
+            populate: '*',
+            filters: {role: {id: {$eq: 4}}}
+          }
+        });
+        console.log(users)
+        this.$routePush({...this.$route.query, operator: users[0].id, user_id: this.$auth.user.id})
+      } catch (err) {
+        console.log(err)
+      }
+    } 
   },
   beforeDestroy () {
     this.socket.emit('leave', {
-      username: this.user.username,
-      user_id: this.user.id
+      username: this.$auth.user.username,
+      user_id: +this.$route.query.user_id
     })
     this.socket.on('left', res => console.log(res))
     this.socket.emit('leaveRoom', {
-      username: this.user.username,
-      room: this.roomId
+      username: this.$auth.user.username,
+      room: +this.$route.query.room_id
     })
+    this.socket.on('leftRoom', res => console.log(res))
+
     this.socket.disconnect()
   }
 }
