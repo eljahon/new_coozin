@@ -24,7 +24,7 @@ export default function ({app, $axios, i18n},inject) {
       i18n.defaultLocale = locale?.keyword ?? i18n.locale;
      await app.router.push(app.switchLocalePath(locale?.keyword ?? i18n.locale))
     } catch (err) {
-         return err;
+         throw new Error(err)
     }
   }
   getLangKeyValues()

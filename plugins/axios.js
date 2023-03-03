@@ -26,6 +26,7 @@ export default function ({ $axios, redirect, $auth, app }) {
       // app.$auth.logout()
       return
     }
+    throw new Error(error)
   })
     $axios.onResponse(data => {
     return data

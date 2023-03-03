@@ -1,12 +1,12 @@
 <template>
   <div v-if="$route.query.login" class="login">
     <div v-if="$route.query.login === 'login'" class="login-modal">
-      <div @click="$routePush({login: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
+      <div @click="$routePush({...$route.query, login: undefined, maps: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
       <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('login-account') }}</h2>
-      <p class="text-lg text-center text-gray-700 mt-1">У вас ещё нет аккаунта?
-        <span @click="$routePush({login: undefined, register: 'register'})" class="text-orange-600 cursor-pointer font-semibold	">{{ $t('registration') }}</span>
+      <p class="text-lg text-center text-gray-700 mt-1">{{$t('have-an-account')}}?
+        <span @click="$routePush({...$route.query,login: undefined, register: 'register', maps: undefined})" class="text-orange-600 cursor-pointer font-semibold	">{{ $t('registration') }}</span>
       </p>
       <ValidationObserver class="w-full" ref="observer" v-slot="{ passes, invalid }">
         <form @submit.prevent="passes(handalePhone)">
@@ -35,7 +35,7 @@
       <!--         <login-phone/>-->
     </div>
     <div v-else-if="$route.query.login === 'otp'" class="login-modal">
-      <div @click="$routePush({login: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
+      <div @click="$routePush({...$route.query, login: undefined, maps: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
       <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('login-account') }}</h2>
@@ -52,7 +52,7 @@
         class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
       >Войти</button>
     </div>
-    <div @click="$routePush({login: undefined})" class="login-background"></div>
+    <div @click="$routePush({...$route.query, login: undefined, maps: undefined})" class="login-background"></div>
   </div>
 </template>
 
@@ -75,13 +75,12 @@ export default {
         this.$auth.setUserToken(jwt)
         await this.$routePush({...this.$route.query,login: undefined})
         await this.$toast.success('success Login')
-        await this.$store.dispatch('cart/getCardList')
       } catch (e) {
-        console.log(e)
         this.$toast.error(e, {
           duration: 2000,
           position: 'bottom-right',
         })
+        throw new Error(e)
       }
     },
     handalePhone() {

@@ -31,7 +31,7 @@
         <div class="flex flex-col justify-between gap-2">
           <div class="flex flex-col md:gap-2 gap-1 w-full modal-text">
             <h2 class="font-normal md:text-xl text-lg text-gray-800">{{ item.name }}</h2>
-            <h4 class="md:text-xl text-lg font-semibold text-gray-700">{{ item.price }} сум <span class="font-normal">/порция</span></h4>
+            <h4 class="md:text-xl text-lg font-semibold text-gray-700">{{ item.price }} {{$t('sum')}} <span class="font-normal">/порция</span></h4>
             <div class="bg-orange-50 rounded-lg p-1.5 flex gap-2 items-center">
               <the-icon src="orange-clock" />
               <p class="text-orange-600 text-sm font-medium">Вам придётся подождать чуть дольше</p>
@@ -60,7 +60,7 @@
               @click.stop="addCazinaOrder"
               class="bg-orange-600 py-2.5  text-center sm:w-56 w-40 text-white rounded-3xl"
             >
-              В корзинку
+              {{$t('Add-to-cart')}}
             </button>
           </div>
         </div>
@@ -85,33 +85,41 @@ export default {
       }
     }
   },
-  mounted() {
-  },
+
   methods: {
   async  increment()
-    {
-
-      if (this.count > 1) {
-        this.count--;
+    {if (this.count > 1) {
+      this.count--;
       }
     },
-   async decrement(){
-
-this.count++
-    },
+   async decrement(){this.count++},
    async addCazinaOrder () {
-    const newItem = {
-       "food_id":this.item.id,
-       "quantity": this.count
-     };
-    await this.closeModal()
-       .then(res => {
-         this.$store.dispatch('cart/newOrderCreate',newItem)
-       })
-    },
-    async closeModal() {
-     return  await this.$routePush({...this.$route.query, foodSaw: undefined})
+  try {
+    if(this.$auth.loggedIn) {
+      const newItem = {
+        vendor: this.$route.query.vendor_id,
+        user: this.$auth.user.id,
+        items: [
+          {
+            product: this.item.id,
+            count: parseInt(this.count) > parseInt(this.item.min_amount) ? this.count : this.item.min_amount
+          }
+        ]
+      }
+      // await this.closeModal()
+      //   .then(res => {
+          this.$store.dispatch('cart/newOrderCreate',newItem)
+        // })
+    } else {
+      this.$toast.info(this.$t('you-are-login'))
     }
+  } catch (err) {
+    throw new Error(err)
+  }
+    },
+    // async closeModal() {
+    //  return  await this.$routePush({...this.$route.query, foodSaw: undefined})
+    // }
   }
 }
 </script>

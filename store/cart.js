@@ -19,12 +19,11 @@ export const actions = {
    async getCardList({commit,state}, payload) {
    const {limit} = payload;
   try {
-    if (!limit) payload['limit'] = 10;
-    const {data} = await this.$axios.get('carts', {...payload})
-    commit('SET_CART_LIST', data.results)
+    const {data:{results}} = await this.$axios.get('carts', {populate:'*',...payload})
+    commit('SET_CART_LIST', results)
     return data.results;
   } catch (err) {
-    return err;
+    throw new Error(err);
   }
  },
    async getCardItem({commit}, payload) {
@@ -34,12 +33,12 @@ export const actions = {
     commit('SET_CART_ITEM', data.results)
     return data.results;
   } catch (err) {
-    return err;
+    throw new Error(err);
   }
  },
    async newOrderCreate ({commit,state, dispatch}, payload) {
     try {
-      const {data} = await this.$axios.post('carts', {...payload})
+      const {data} = await this.$axios.post('/orders/assign/cart', {...payload})
         await dispatch('getCardList',{limit: 10})
       this.$toast.success('new order item corzina add')
       return data.results;

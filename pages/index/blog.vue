@@ -104,7 +104,11 @@ export default {
     }
   },
   async fetch() {
-    await this.getBlogs()
+   try {
+      await this.getBlogs()
+    } catch (err) {
+     throw new Error(err)
+   }
   }
 }
 </script>

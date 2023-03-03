@@ -48,7 +48,9 @@ name: "",
   },
   beforeDestroy () {
   this.socket.disconnect()
-    this.socket.emit('hi')
+    this.socket.emit('leaveRoom')
+    this.socket.emit('leave')
+    this.socket.disconnect()
   }
 }
 </script>

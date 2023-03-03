@@ -171,7 +171,7 @@
             <blog-card
               :title="`${item?.vendor?.user?.first_name}' ' ${item?.vendor?.user?.last_name}`"
               :avatar="item?.vendor?.user.avatar?.aws_path"
-              :src="item.image.aws_path"
+              :src="item?.image?.aws_path"
             />
           </div>
         </div>
@@ -228,6 +228,7 @@ import {mapGetters} from "vuex"
         await this.getVendors()
         await this.getReels()
       } catch (err) {
+        throw new Error(err)
       }
     },
     methods: {
@@ -243,6 +244,7 @@ import {mapGetters} from "vuex"
        this.categories.unshift(this.$i18n.locale === 'uz' ? {name: 'Hammasi', id: 'all'} : {name: 'Все', id: 'all'})
 
         } catch (err) {
+          throw new Error(err)
         }
       },
       async getCollection() {
@@ -252,13 +254,16 @@ import {mapGetters} from "vuex"
             locale: this.$i18n.locale
           })
           this.collections = results
-        } catch (err) {}
+        } catch (err) {
+          return err
+        }
       },
     async  getVendors() {
-      const {data: {results, pagination}} = await this.$axios.get('vendors/all', {
+     try {
+        const {data: {results, pagination}} = await this.$axios.get('vendors/all', {
           params: {
             populate: "passport, patent, background, user, user.avatar, *",
-           locale: this.$i18n.locale,
+            locale: this.$i18n.locale,
             pagination: this.pagination,
             filters: {
               categories: {
@@ -268,10 +273,13 @@ import {mapGetters} from "vuex"
               },
               verified: {$eq: true}
             }
-            }
+          }
         });
-      this.vendorData = results
-     this.total =pagination.total;
+        this.vendorData = results
+        this.total = pagination.total;
+      } catch(err) {
+       throw new Error(err)
+     }
       },
       async getReels() {
         try {
@@ -282,7 +290,8 @@ import {mapGetters} from "vuex"
             }
           });
           this.blogCard = results
-        } catch (e) {
+        } catch (err) {
+          throw new Error(err)
         }
       },
       async onDatesFilter (item) {
@@ -301,15 +310,21 @@ import {mapGetters} from "vuex"
         this.getVendors()
       },
      async pageCount () {
-        if(this.pagination.pageSize < this.total) {
-          this.isPageCount = true;
-          this.pagination.pageSize+=4
-          await this.getVendors()
-          this.isPageCount = false;
-        } else {
-          this.isPageCount = true
-        }
+    try {
+      if(this.pagination.pageSize < this.total) {
+        this.isPageCount = true;
+        this.pagination.pageSize+=4
+        await this.getVendors()
+        this.isPageCount = false;
+      } else {
+        this.isPageCount = true
       }
+    } catch(err) {
+      throw new Error(err)
+    }
+
+     }
+
     },
     computed: {
       ...mapGetters(['get_days_list']),

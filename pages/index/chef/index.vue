@@ -19,19 +19,31 @@
                     itemVendor?.ratings_avg ? itemVendor.ratings_avg : '0'
                   }}</span>
               </div>
+
               <button v-if="$auth.loggedIn && isFollow"
                       @click="unFollowPatch"
-                   class="flex items-center justify-center gap-2 md:py-2 md:px-5 px-3 bg-white rounded-full cursor-pointer">
+                      class="flex items-center justify-center gap-2 md:py-2 md:px-5 px-3 bg-white rounded-full cursor-pointer">
                 <the-icon src="chef" width="16" height="16"/>
                 <span
-                    class="text-gray-800 md:text-xl sm:text-lg text-base text-gray-800 font-medium">{{$t('you-subscribed')}}</span>
+                  class="text-gray-800 md:text-xl sm:text-lg text-base text-gray-800 font-medium">{{
+                    $t('you-subscribed')
+                  }}</span>
               </button>
               <button v-else
-                   @click="followPatch"
-                   class="flex items-center justify-center gap-2 md:py-2 py-1 px-5 bg-white rounded-full cursor-pointer">
+                      @click="followPatch"
+                      class="flex items-center justify-center gap-2 md:py-2 py-1 px-5 bg-white rounded-full cursor-pointer">
                 <the-icon src="chef-hat" width="16" height="16"/>
-                <span class="text-gray-800 md:text-xl sm:text-lg text-base text-gray-800 font-medium">{{$t('subscribe')}}</span>
+                <span
+                  class="text-gray-800 md:text-xl sm:text-lg text-base text-gray-800 font-medium">{{
+                    $t('subscribe')
+                  }}</span>
               </button>
+              <div class="flex items-center gap-2 md:px-4 px-3 bg-white rounded-full">
+                <img width="16" height="16" src="~/assets/svg/car.svg" alt="Car icon">
+                <span class="text-gray-800 md:text-xl sm:text-lg text-base">{{
+                    itemVendor?.delever_price ? itemVendor.delever_price : '10000+'
+                  }}{{$t('sum')}}</span>
+              </div>
             </div>
             <div
               class="flex lg:flex-row flex-col lg:gap-0 lg:items-center lg:justify-between xl:px-0 lg:gap-0 sm:gap-6 gap-4">
@@ -104,8 +116,8 @@
           <span class="text-sm text-gray-700">{{ $t('see-more') }}</span>
         </button>
         <br>
-<!--        <yandex-maps v-if="coor[0] !== null " :marker-icon="coor"/>-->
-        <yandex-maps />
+        <!--        <yandex-maps v-if="coor[0] !== null " :marker-icon="coor"/>-->
+        <yandex-maps/>
       </div>
 
       <!--      <div class="container mx-auto overflow-x-scroll scroll-style my-7">-->
@@ -153,8 +165,9 @@
 <script>
 import yandexMaps from "~/components/yandex-maps/yandex-maps";
 import img from '~/assets/img/vendor.png'
+
 export default {
-  auth:false,
+  auth: false,
   components: {
     yandexMaps
   },
@@ -177,54 +190,90 @@ export default {
       },
       blogCard: [],
       itemVendor: {},
-      foods: []
+      foods: [],
+      isFollow: false
+    }
+  },
+  watch: {
+    '$auth.loggedIn': function (val) {
+      if(val) this.$fetch()
+    },
+    '$route.query.category_id': function (val) {
+      this.getFood()
+    },
+    '$route.query': function (val) {
+      this.isFood = false
     }
   },
   async fetch() {
-   try {
-     await this.getItem()
-     // await this.getCategories()
-   } catch (err) {
-
-   }
+    try {
+      await this.getItem()
+      if (this.$auth.loggedIn) {
+        await this.getChekfollow()
+      }
+      await this.getCategories()
+    } catch (err) {
+      throw new Error(err)
+    }
   },
   methods: {
-    async getUserMe () {
-        const {data} =await this.$axios.get('users/me')
-      console.log(data)
-            this.$auth.setUser(data)
-    },
-    async followPatch () {
+    async getChekfollow() {
       try {
-        const {data} = await this.$axios.patch(`follow/vendor/${this.$route.query.vendor_id}/user/${this.$auth.user.id}`)
-        console.log(data)
-        if (data.status) {
-          this.$toast.success(data.status)
-          await this.getUserMe()
-          // console.log(data)
+        const {data} = await this.$axios.get('is_followed', {
+          params: {
+            vendor: this.$route.query.vendor_id
+          }
+        })
+        this.isFollow = data;
+        return data
+      } catch (err) {
+        throw new Error(err)
+      }
+    },
+    async followPatch() {
+      try {
+        if (this.$auth.loggedIn) {
+          const {data} = await this.$axios.patch(`follow/vendor/${this.$route.query.vendor_id}`)
+          if (data.status) {
+            this.$toast.success(data.status)
+            this.getChekfollow()
+          }
+        } else {
+          this.$toast.info(this.$t('system-login'))
         }
-      } catch (err) {}
+      } catch (err) {
+        throw new Error(err)
+      }
 
     },
-    async unFollowPatch () {
+    async unFollowPatch() {
       try {
-        const {data} = await this.$axios.patch(`unfollow/vendor/${this.$route.query.vendor_id}/user/${this.$auth.user.id}`)
-        if (data.status) {
-          this.$toast.success(data.status)
-          await this.getUserMe()
+        if (this.$auth.loggedIn) {
+          const {data} = await this.$axios.patch(`unfollow/vendor/${this.$route.query.vendor_id}`)
+          if (data.status) {
+            this.$toast.success(data.status)
+            await this.getChekfollow()
+
+          }
+        } else {
+          this.$toast.info(this.$t('system-login'))
         }
-      } catch (err) {}
+
+      } catch (err) {
+      }
 
     },
     showFood(item) {
-     this.isShowFood()
+      this.isShowFood()
       this.foodDetail = item;
     },
-    isShowFood () {
+    isShowFood() {
       this.isFood = !this.isFood
     },
-    async getFood(id) {
-      const {data:{results, pagination}} = await this.$axios.get('products', {
+    async getFood() {
+    try {
+      const _params = {...this.$route.query}
+      const {data: {results, pagination}} = await this.$axios.get('products', {
         params: {
           // limit: 10,
           locale: this.$i18n.locale,
@@ -233,17 +282,26 @@ export default {
           filters: {
             vendor: {
               id: {
-                $eq: this.$route.query.vendor_id
+                $eq: _params.vendor_id
+              }
+            },
+            category:{
+              id: {
+                $eq: _params.category_id ?? undefined
               }
             }
           }
-          // vendor_id: this.$route.query.vendor_id,
-          // category_id: id ?? undefined
         }
       });
+      if(results.length === 0) {
+        this.$toast.info(this.$t('food-is-not'))
+      }
       this.foods = results;
       this.total = pagination.total;
       return results;
+    } catch(err){
+      throw new Error(err)
+    }
     },
     async getItem() {
       try {
@@ -257,9 +315,9 @@ export default {
         this.coor = [data.location.lat, data.location.long]
 
         await this.getFood()
-
+           return data
       } catch (err) {
-        return err
+        throw new Error(err)
       }
     },
     imageSee(item) {
@@ -267,19 +325,23 @@ export default {
     },
     async getCategories() {
       try {
-        const {results} = await this.$axios.get('categories');
+        const {data:{results}} = await this.$axios.get('categories', {
+          params: {
+            populate: '*',
+            locale: this.$i18n.locale
+          }
+        });
         this.categories = results;
         this.categories.unshift({name: this.$t('all'), id: 'all'})
       } catch (err) {
+        throw new Error(err)
       }
     },
-    async categoriesFilter(item) {
+     categoriesFilter(item) {
       if (item.category_id === 'all') {
-        // await this.$routePush({...this.$route.query, category_id: undefined});
-        await this.getFood()
+        this.$routePush({...this.$route.query, category_id: undefined})
       } else {
-        // await this.$routePush({...this.$route.query, category_id: item.category_id});
-        await this.getFood(item.category_id)
+         this.$routePush({...this.$route.query, category_id: item.category_id});
       }
 
     },
@@ -294,14 +356,19 @@ export default {
           this.isPageCount = true
         }
       } catch (err) {
+        throw new Error(err)
       }
-    }
+    },
+
   },
   computed: {
-   isFollow () {
-     return this.$auth.user.vendors.map(el => el.id).includes(Number(this.$route.query.vendor_id))
-   }
-  }
+    // isFollow() {
+    //   return false
+    // }
+  },
+  // mounted() {
+  //   this.$bridge.$on('chef_to_get', async () => await this.getAllRequest())
+  // }
 }
 </script>
 
