@@ -13,16 +13,16 @@
               v-for="message in messages"
               :key="message?.id"
               class="relative group"
-              :class="message.sender?.id == $auth.user?.id ? 'user' : 'operator'"
+              :class="message?.sender?.id == $auth.user?.id ? 'user' : 'operator'"
             >
-              <span>{{ message.text }}</span>
+              <span>{{ message?.text }}</span>
               <div 
                 class="flex gap-1.5 absolute group-hover:flex p-3"
-                :class="message.sender?.id == $auth.user.id ? '-left-14 bottom-0' : 'hidden'"
+                :class="message?.sender?.id == $auth.user.id ? '-left-14 bottom-0' : 'hidden'"
               >
                 <div 
                   class="hidden group-hover:flex gap-1.5"
-                  :class="message.sender?.id !== $auth.user?.id ? 'group-hover:hidden' : ''"
+                  :class="message?.sender?.id !== $auth.user?.id ? 'group-hover:hidden' : ''"
                 >
                   <div @click="editMessage(message)">
                     <the-icon  class="cursor-pointer" src="edit" width="16" />
@@ -64,7 +64,9 @@ export default {
       socket: null,
       messages: [],
       inputMessage: '',
-      roomOpen: false
+      roomOpen: false,
+      update: false,
+      editID: 0,
     }
   },
   async mounted() {
@@ -160,8 +162,13 @@ export default {
     async listenMessage() {
       try {
         this.socket.on('message', res => {
-          this.messages.push(res.data)
-          console.log('message', res);
+          if (this.messages.findIndex(el => el.id == res.data.id) == -1) {
+            this.messages.push(res.data)
+          } else {
+            const index = this.messages.findIndex(el => el.id == res.data.id)
+            this.messages[index].text = res.data.text
+          }
+          this.chatToBottom()
         })
       } catch (err) {
         console.log(err)
@@ -185,40 +192,57 @@ export default {
         this.roomOpen = true
       }
 
+      // Update Message
+      if (this.update) {
+        this.updateMessage()
+      } 
       // Send Message
-      if (this.inputMessage.length) {
+      else if (!this.update && this.inputMessage.length) {
         await this.socket.emit("sendMessage", {
           text: this.inputMessage,
           sender: +this.$route.query.user_id,
-          receiver: this.$route.query.operator,
+          receiver: +this.$route.query.operator,
           room: +this.$route.query.room_id,
           seen: true
         })
-
-        // Go to bottom of chat
-        await this.chatToBottom()
-
-        // Clear input of chat
-        this.inputMessage = ''
       }
+      // Clear input of chat
+      this.inputMessage = ''
+      this.update = false
     },
-    async editMessage(message) {
+    editMessage(message) {
+      this.editID = message.id
+      this.inputMessage = message.text
+      this.update = true
+      console.log(message)
+    },
+    async updateMessage() {
       try {
-        this.socket.emit('editRoom', {
-          text: this.inputMessage,
-          sender: +this.$route.query.user_id,
-          receiver: +this.$route.query.operator_id,
-          room: +this.$route.query.room_id,
-          seen: true
+        this.socket.emit('editMessage', {
+          id: this.editID,
+          data: {
+            text: this.inputMessage,
+            sender: +this.$route.query.user_id,
+            receiver: +this.$route.query.operator,
+            room: +this.$route.query.room_id,
+            seen: true
+          }
         })
-        console.log(message)
       } catch(err) {
         console.log(err);
       }
     },
     async deleteMessage(message) {
+      console.log(message);
       try {
-        console.log(message)
+        const index = this.messages.findIndex(res => res.id == message.id)
+        await this.socket.emit('deleteMessage', {
+          id: message.id,
+          room: message.room.id
+        })
+        await this.messages.splice(index, 1)
+        this.inputMessage = ''
+        this.update = false
       } catch(err) {
         console.log(err);
       }
