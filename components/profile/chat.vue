@@ -12,9 +12,26 @@
             <div
               v-for="message in messages"
               :key="message?.id"
+              class="relative group"
               :class="message.sender?.id == $auth.user?.id ? 'user' : 'operator'"
             >
-              {{ message.text }}
+              <span>{{ message.text }}</span>
+              <div 
+                class="flex gap-1.5 absolute group-hover:flex p-3"
+                :class="message.sender?.id == $auth.user.id ? '-left-14 bottom-0' : 'hidden'"
+              >
+                <div 
+                  class="hidden group-hover:flex gap-1.5"
+                  :class="message.sender?.id !== $auth.user?.id ? 'group-hover:hidden' : ''"
+                >
+                  <div @click="editMessage(message)">
+                    <the-icon  class="cursor-pointer" src="edit" width="16" />
+                  </div>
+                  <div @click="deleteMessage(message)">
+                    <the-icon class="cursor-pointer" src="delete" width="16" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -56,7 +73,7 @@ export default {
       username: this.$auth.user.username,
       user_id: this.$auth.user.id
     });
-    await this.socket.on('joined', message => console.log("Joined: ", message));
+    await this.socket.on('joined', message => console.log(message));
     await this.getOperator()
     await this.getRooms()
     await this.getMessages()
@@ -159,6 +176,7 @@ export default {
         await this.listenMessage()
         this.roomOpen = true
       }
+
       // Open romm
       else if (!this.roomOpen) {
         await this.joinRoom()
@@ -177,9 +195,32 @@ export default {
           seen: true
         })
 
+        // Go to bottom of chat
         await this.chatToBottom()
 
-        this.inputMessage = await ''
+        // Clear input of chat
+        this.inputMessage = ''
+      }
+    },
+    async editMessage(message) {
+      try {
+        this.socket.emit('editRoom', {
+          text: this.inputMessage,
+          sender: +this.$route.query.user_id,
+          receiver: +this.$route.query.operator_id,
+          room: +this.$route.query.room_id,
+          seen: true
+        })
+        console.log(message)
+      } catch(err) {
+        console.log(err);
+      }
+    },
+    async deleteMessage(message) {
+      try {
+        console.log(message)
+      } catch(err) {
+        console.log(err);
       }
     },
     chatToBottom() {
