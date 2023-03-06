@@ -39,49 +39,73 @@
       </div>
     </div>
     <div v-else class="main-styles pb-8">
-      <!--  Banner  -->
-      <!-- <div class="container mx-auto py-8 xl:px-0 px-4 lg:block hidden">
-        <div class="lg:flex lg:justify-center lg:gap-4">
+
+      <!-- Banner -->
+      <div class="container mx-auto xl:grid grid-cols-4 gap-2 py-8 hidden">
+        <div class="rounded-2xl overflow-hidden h-80">
           <banner-card
-            :src="collections[0]?.banner?.url"
-            add-style="card-1"
+            src="https://picsum.photos/300/400"
+            add-style="w-full h-full"
             :status="collections[0]?.name"
-            status-style="text-cyan-600 bg-teal-50"
+            status-style="text-green-600 bg-green-50"
           />
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-4">
+        </div>
+        <div class="rounded-2xl overflow-hidden h-80 flex flex-col gap-2">
+          <div class="grid grid-cols-2 w-full gap-2">
+            <div class="rounded-2xl overflow-hidden h-44">
               <banner-card
-                :src="collections[1]?.banner?.url"
-                add-style="card-2"
+                src="https://picsum.photos/200/200"
+                add-style="w-full h-full"
                 :status="collections[1]?.name"
-                status-style="text-red-600 bg-red-50"
-              />
-              <banner-card
-                :src="collections[2]?.banner?.url"
-                add-style="card-3"
-                :status="collections[2]?.name"
-                status-style="text-orange-600 bg-orange-50"
+                status-style="text-green-600 bg-green-50"
               />
             </div>
-            <div class="flex items-center gap-4">
+            <div class="rounded-2xl overflow-hidden h-44">
               <banner-card
-                :src="collections[3]?.banner?.url"
-                add-style="card-4"
-                :status="collections[3]?.name"
-                status-style="text-purple-600 bg-purple-50"
-              />
-              <banner-card
-                :src="collections[4]?.banner?.url"
-                add-style="card-5"
-                :status="collections[4]?.name"
+                src="https://picsum.photos/201/200"
+                add-style="w-full h-full"
+                :status="collections[1]?.name"
                 status-style="text-green-600 bg-green-50"
               />
             </div>
           </div>
+          <div class="grid grid-cols-1">
+            <banner-card
+              src="https://picsum.photos/301/201"
+              add-style="w-full h-full"
+              :status="collections[0]?.name"
+              status-style="text-green-600 bg-green-50"
+            />
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden h-80">
+          <banner-card
+            src="https://picsum.photos/302/402"
+            add-style="w-full h-full"
+            :status="collections[0]?.name"
+            status-style="text-green-600 bg-green-50"
+          />
+        </div>
+        <div class="rounded-2xl overflow-hidden h-80 flex flex-col gap-2">
+          <div class="grid grid-cols-1">
+            <banner-card
+              src="https://picsum.photos/302/203"
+              add-style="w-full h-44"
+              :status="collections[0]?.name"
+              status-style="text-green-600 bg-green-50"
+            />
+          </div>
+          <div class="grid grid-cols-1">
+            <banner-card
+              src="https://picsum.photos/301/201"
+              add-style="w-full h-full"
+              :status="collections[0]?.name"
+              status-style="text-green-600 bg-green-50"
+            />
+          </div>
         </div>
       </div>
-
-      <div class="lg:hidden container mx-auto overflow-x-scroll sm:py-6 py-2 xl:px-0 sm:px-4 px-2 scroll-style">
+      <div class="xl:hidden container mx-auto overflow-x-scroll sm:py-6 py-2 xl:px-0 sm:px-4 px-2 scroll-style">
         <div class="flex items-center sm:gap-4 gap-2 w-full">
           <banner-card
             v-for="item in collections"
@@ -92,13 +116,8 @@
             add-style="rwd-card flex shrink-0"
           />
         </div>
-      </div> -->
-
-      <div class="container mx-auto py-8">
-        <div class="">
-
-        </div>
       </div>
+      <!-- Banner end -->
 
       <!--  Menu section  -->
       <div class="container mx-auto xl:px-0 sm:px-4 px-2 sm:py-8 py-4">
@@ -145,7 +164,7 @@
             :title="item?.user?.first_name + ' ' + item?.user?.last_name"
             :product-img="item?.background"
             :avatar="item?.user?.avatar?.aws_path"
-            :rate="item?.ratings_avg ?? 4.3"
+            :rate="item?.rating ?? 4.3"
             :deliveryPrice="item?.delivery_price ?? 10000 +'+'"
             :count="idx + 1"
           />
@@ -159,31 +178,31 @@
         <span class="text-sm text-gray-700">{{ $t('see-more') }}</span>
       </button>
 
-<!--      &lt;!&ndash;  Blog section  &ndash;&gt;-->
-<!--      <div class="container mx-auto xl:px-0 sm:px-4 px-2 sm:py-6 py-5">-->
-<!--        <div class="flex items-center justify-between">-->
-<!--          <h2 id="blog" class="text-3xl font-semibold text-gray-800">-->
-<!--            <a href="#menu">{{ $t('blog') }}</a>-->
-<!--          </h2>-->
-<!--          <div class="flex items-center gap-1">-->
-<!--            <nuxt-link class="font-normal text-orange-600 cursor-pointer" to="/blog">{{ $t('see-more') }}</nuxt-link>-->
-<!--            <the-icon src="right-arrow" />-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="container mx-auto overflow-x-scroll scroll-style sm:px-0 px-2">-->
-<!--        <div class="flex items-center gap-3.5">-->
-<!--          <div v-for="item in blogCard" :key="item.id">-->
-<!--            <blog-card-->
-<!--              :src="item?.media[0]?.url"-->
-<!--              :title="item.title"-->
-<!--              :avatar="item.vendor.avatar"-->
-<!--            />-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--  Blog section  -->
+      <div class="container mx-auto xl:px-0 sm:px-4 px-2 sm:py-6 py-5">
+        <div class="flex items-center justify-between">
+          <h2 id="blog" class="text-3xl font-semibold text-gray-800">
+            <a href="#menu">{{ $t('blog') }}</a>
+          </h2>
+          <div class="flex items-center gap-1">
+            <nuxt-link class="font-normal text-orange-600 cursor-pointer" to="/blog">{{ $t('see-more') }}</nuxt-link>
+            <the-icon src="right-arrow" />
+          </div>
+        </div>
+      </div>
+      <div class="container mx-auto overflow-x-scroll scroll-style sm:px-0 px-2">
+        <div class="flex items-center gap-3.5">
+          <div v-for="item in blogCard" :key="item.id">
+            <blog-card
+              :title="`${item?.vendor?.user?.first_name}' ' ${item?.vendor?.user?.last_name}`"
+              :avatar="item?.vendor?.user.avatar?.aws_path"
+              :src="item?.image?.aws_path"
+            />
+          </div>
+        </div>
+      </div>
 
-      <Loader :active="$store.state.loader" />
+<!--      <Loader :active="$store.state.loader" />-->
     </div>
   </div>
 </template>
@@ -234,6 +253,7 @@ import {mapGetters} from "vuex"
         await this.getVendors()
         await this.getReels()
       } catch (err) {
+        throw new Error(err)
       }
     },
     methods: {
@@ -249,6 +269,7 @@ import {mapGetters} from "vuex"
        this.categories.unshift(this.$i18n.locale === 'uz' ? {name: 'Hammasi', id: 'all'} : {name: 'Все', id: 'all'})
 
         } catch (err) {
+          throw new Error(err)
         }
       },
       async getCollection() {
@@ -258,31 +279,44 @@ import {mapGetters} from "vuex"
             locale: this.$i18n.locale
           })
           this.collections = results
-        } catch (err) {}
+        } catch (err) {
+          return err
+        }
       },
     async  getVendors() {
-      const {data: {results, pagination}} = await this.$axios.get('vendors/all', {
+     try {
+        const {data: {results, pagination}} = await this.$axios.get('vendors/all', {
           params: {
             populate: "passport, patent, background, user, user.avatar, *",
-           locale: this.$i18n.locale,
+            locale: this.$i18n.locale,
             pagination: this.pagination,
             filters: {
               categories: {
                 id: {
                   $eq: this.$route.query.category_id ?? undefined
                 }
-              }
+              },
+              verified: {$eq: true}
             }
-            }
+          }
         });
-      this.vendorData = results
-     this.total =pagination.total;
+        this.vendorData = results
+        this.total = pagination.total;
+      } catch(err) {
+       throw new Error(err)
+     }
       },
       async getReels() {
         try {
-          const {data: {results, pagination}} =  await this.$axios.get('reels');
+          const {data: {results, pagination}} =  await this.$axios.get('reels', {
+            params: {
+              populate: 'image, vendor, background, vendor.user, vendor.background, vendor.user.avatar',
+              locale: this.$i18n.locale
+            }
+          });
           this.blogCard = results
-        } catch (e) {
+        } catch (err) {
+          throw new Error(err)
         }
       },
       async onDatesFilter (item) {
@@ -293,7 +327,6 @@ import {mapGetters} from "vuex"
         return this.$store.dispatch('set_day').then(res => this.pending = false)
       },
       categoriesFilter (item) {
-        console.log(item)
         if (item.category_id === 'all') {
           this.$routePush({...this.$route.query,category_id: undefined})
         } else {
@@ -302,15 +335,21 @@ import {mapGetters} from "vuex"
         this.getVendors()
       },
      async pageCount () {
-        if(this.pagination.pageSize < this.total) {
-          this.isPageCount = true;
-          this.pagination.pageSize+=4
-          await this.getVendors()
-          this.isPageCount = false;
-        } else {
-          this.isPageCount = true
-        }
+    try {
+      if(this.pagination.pageSize < this.total) {
+        this.isPageCount = true;
+        this.pagination.pageSize+=4
+        await this.getVendors()
+        this.isPageCount = false;
+      } else {
+        this.isPageCount = true
       }
+    } catch(err) {
+      throw new Error(err)
+    }
+
+     }
+
     },
     computed: {
       ...mapGetters(['get_days_list']),

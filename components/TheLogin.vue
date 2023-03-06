@@ -177,7 +177,6 @@ export default {
   top: 14px;
   right: 14px;
 }
-
 .login-modal {
   position: fixed;
   z-index: 5;
@@ -190,7 +189,6 @@ export default {
   transform: translate(-50%, -50%);
   border-radius: 16px;
 }
-
 @media screen and (max-width: 450px) {
   .login-modal {
     width: 96%;

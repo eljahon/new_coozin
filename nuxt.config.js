@@ -21,13 +21,14 @@ export default {
       }
     ],
   },
+  target: 'server',
   css: [
     "@/assets/css/main.css",
     "@assets/css/tailwind.css"
   ],
-  axios: {
-    baseUrl: 'https://testbackend.coozin.uz/api/'
-  },
+  // axios: {
+  //   baseUrl: 'https://testbackend.coozin.uz/api/'
+  // },
   plugins: [
     { src: "~/plugins/axios.js" },
     { src: '@/plugins/yandex.js', ssr: false},
@@ -89,6 +90,13 @@ export default {
   i18n: i18n,
   router: {
     // mode: 'hash',
+    scrollBehavior(to, from, savedPosition) {
+      if (savedPosition) {
+        return savedPosition;
+      }
+
+      return { x: 0, y: 0 };
+    },
     middleware: ['auth'],
     prefetchLinks: false
   },

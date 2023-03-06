@@ -53,10 +53,8 @@
     </div>
   </div>
 </template>
-
 <script>
 import io from 'socket.io-client'
-
 export default {
   name: "chat_pages",
   data() {
@@ -183,7 +181,6 @@ export default {
         await this.listenMessage()
         this.roomOpen = true
       }
-
       // Open romm
       else if (!this.roomOpen) {
         await this.joinRoom()
@@ -191,7 +188,6 @@ export default {
         await this.listenMessage()
         this.roomOpen = true
       }
-
       // Update Message
       if (this.update) {
         this.updateMessage()
@@ -278,12 +274,10 @@ export default {
       room: +this.$route.query.room_id
     })
     this.socket.on('leftRoom', res => console.log(res))
-
     this.socket.disconnect()
   }
 }
 </script>
-
 <style scoped>
 .operator {
   background: #E0F2FE;

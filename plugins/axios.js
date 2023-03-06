@@ -15,7 +15,6 @@ export default function ({ $axios, redirect, $auth, app }) {
     }
   })
   $axios.onError((error) => {
-    console.log(error.response)
     const code = parseInt(error.response.status)
     if (code === 400) {
       return
@@ -27,6 +26,7 @@ export default function ({ $axios, redirect, $auth, app }) {
       // app.$auth.logout()
       return
     }
+    throw new Error(error)
   })
     $axios.onResponse(data => {
     return data

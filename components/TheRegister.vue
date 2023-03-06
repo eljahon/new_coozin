@@ -87,7 +87,6 @@
 
 <script>
 import registerConfirm from './register/register-confirm.vue'
-
 export default {
   props: ['hide'],
   components: {
@@ -161,7 +160,6 @@ export default {
   top: 14px;
   right: 14px;
 }
-
 .register-modal {
   position: fixed;
   z-index: 3;

@@ -11,7 +11,7 @@
         <the-icon src="clock" />
         <span class="text-sm text-gray-700 font-normal">> {{ delay }} min</span>
       </div>
-      <div @click.stop="toCarzinca(item)"  class="absolute cursor-pointer right-3 bottom-3 bg-orange-100	h-12 w-12 rounded-full overflow-hidden flex items-center justify-center effect">
+      <div  class="absolute cursor-pointer right-3 bottom-3 bg-orange-100	h-12 w-12 rounded-full overflow-hidden flex items-center justify-center effect">
         <button class="icon-bnt">
           <the-icon src="shopping-cart" />
         </button>
@@ -19,7 +19,6 @@
     </div>
   </div>
 </template>
-
 <script>
 export default {
   props: ['src', 'delay', 'title', 'price', 'item', 'user'],
@@ -30,17 +29,18 @@ export default {
   },
   data () {
     return {
+      form: {
+        vendor: this.$route.query.vendor_id,
+        items: [],
+        user: this.$auth.loggedIn  ? this.$auth?.user?.id : null
+      }
     }
   },
   methods: {
     toCarzinca(item) {
     try {
-        const newItem = {
-          "food_id":item.id,
-          "quantity":1
-        };
       if (this.$auth.state.loggedIn) {
-        this.$store.dispatch('cart/newOrderCreate', newItem)
+        this.$store.dispatch('carts', newItem)
       } else {
         this.$routePush({...this.$route.query, login: 'login'})
         // const vendor_id = Number(this.$route.query.vendor_id)

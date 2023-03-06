@@ -200,7 +200,6 @@ export default {
   methods: {
    async getLocales () {
       const {data: {results, pagination}} = await this.$axios.get('languages');
-     console.log(results)
      this.langList = results
     },
     showLocations (value) {
@@ -226,12 +225,12 @@ export default {
     },
     locations () {
       this.modal = false;
-      this.$routePush({...this.$route.query,maps: 'maps'})
+      this.$routePush({...this.$route.query,maps: 'maps', login: undefined, register: undefined})
       // window.navigator.geolocation.getCurrentPosition(this.showLocations)
     },
     openModalYandexMpas () {
       this.modal = false;
-      this.$routePush({...this.$route.query,maps: 'maps'})
+      this.$routePush({...this.$route.query,maps: 'maps', login: undefined, register: undefined})
     },
     changePlace(listPlice) {
       this.address = listPlice.fullName;
@@ -259,10 +258,7 @@ export default {
           })
         }
       } else {
-        await this.$router.push({
-          path: this.localePath(this.$route.path),
-          query: {...this.$route.query, login: 'login'}
-        })
+        await this.$routePush({...this.$route.query, login: 'login',maps: undefined})
       }
     },
   async  handleLang(item) {
