@@ -4,12 +4,12 @@
       <div class="flex md:flex-nowrap flex-wrap  md:p-4 p-3 rounded-t-2xl overflow-hidden md:gap-5 gap-3 food-modal__item">
         <div class="flex flex-col md:gap-3 gap-2">
           <div class="img">
-            <img v-if="item?.media[0]?.aws_path" class="w-full h-full object-cover" :src="$img+item.media[0].aws_path"  alt="Phone">
+            <img v-if="item?.media[0]?.aws_path" class="w-full h-full object-cover" :src="$img+item.media[0]?.aws_path"  alt="Phone">
             <img v-else class="w-full h-full object-cover" src="@/assets/img/img-1.jpg" alt="Phone">
           </div>
           <div class="flex items-center gap-3">
             <div class="avatar">
-              <img v-if="user?.user?.avatar?.aws_path" class="w-full object-cover" :src="$img+user.user.avatar.aws_path" alt="Avatar">
+              <img v-if="user?.user?.avatar?.aws_path" class="w-full object-cover" :src="$img+user.user.avatar?.aws_path" alt="Avatar">
               <img v-else class="w-full object-cover" :src="img" alt="Avatar">
             </div>
             <div class="flex flex-col gap-2">

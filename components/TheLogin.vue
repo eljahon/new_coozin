@@ -1,12 +1,12 @@
 <template>
-  <div v-if="$route.query.login" class="login">
-    <div v-if="$route.query.login === 'login'" class="login-modal">
-      <div @click="$routePush({...$route.query, login: undefined, maps: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
+  <div v-if="$route.query.login === 'login'" class="login">
+    <div v-if="isLogin" class="login-modal">
+      <div @click="close" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
       <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('login-account') }}</h2>
-      <p class="text-lg text-center text-gray-700 mt-1">{{$t('have-an-account')}}?
-        <span @click="$routePush({...$route.query,login: undefined, register: 'register', maps: undefined})" class="text-orange-600 cursor-pointer font-semibold	">{{ $t('registration') }}</span>
+      <p class="text-lg text-center text-gray-700 mt-1">У вас ещё нет аккаунта?
+        <span @click="$routePush({login: undefined, register: 'register'})" class="text-orange-600 cursor-pointer font-semibold	">{{ $t('registration') }}</span>
       </p>
       <ValidationObserver class="w-full" ref="observer" v-slot="{ passes, invalid }">
         <form @submit.prevent="passes(handalePhone)">
@@ -19,8 +19,9 @@
             <input
               name="phone"
               class="block bg-white text-gray-500 border rounded-2xl border-gray-200 py-2.5 px-4 text-base h-12 outline-orange-600 sm:w-96 w-full bg-gray-100 my-4 m-auto"
-              v-model="login.phone"
-              placeholder="номер телефона +9989 XXX XX XX"
+              v-model.trim="phone"
+              @input="checkPhone"
+              :placeholder="$t('enter-phone-or-email')"
               :state="errors[0] ? false : valid ? true : null"
               :class="errors.length > 0 ? 'border-red-700': ''"
               type="text"
@@ -34,8 +35,8 @@
       </ValidationObserver>
       <!--         <login-phone/>-->
     </div>
-    <div v-else-if="$route.query.login === 'otp'" class="login-modal">
-      <div @click="$routePush({...$route.query, login: undefined, maps: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
+    <div v-else class="login-modal">
+      <div @click="$routePush({login: undefined})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
       <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('login-account') }}</h2>
@@ -47,13 +48,29 @@
         placeholder="Enter OTP"
         type="text"
       >
-      <span @click="resendOtp" class="text-lg font-bold text-right mb-4 mr-4 text-orange-500 cursor-pointer">{{ $t('resend-otp') }}</span>
-      <button
+      <div class="flex items-center justify-between mb-4">
+          <span v-if="count">
+            {{ timer + count }}
+          </span>
+          <span></span>
+          <span 
+            @click="resendOtp" 
+            class="text-lg font-bold text-right text-orange-500"
+            :class="count ? 'cursor-wait' : 'cursor-pointer'"
+          >
+            {{ $t('resend-otp') }}
+          </span>
+       </div>
+      <input
         @click="submitLogin"
         class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
-      >Войти</button>
+        :class="!login.otp.length || disabled ? 'opacity-70' : ''"
+        value="Войти"
+        type="button"
+        :disabled="!login.otp.length || disabled"
+      />
     </div>
-    <div @click="$routePush({...$route.query, login: undefined, maps: undefined})" class="login-background"></div>
+    <div @click="close" class="login-background"></div>
   </div>
 </template>
 
@@ -63,41 +80,82 @@ export default {
   components: {LoginPhone},
   data() {
     return {
+      isLogin: true,
+      phone: '',
+      timer: '00:',
+      count: 0,
       login: {
         phone: '',
         otp: ''
-      }
+      },
+      disabled: false
     }
   },
   methods: {
-    resendOtp() {
-          this.$axios.post('/users-permissions/resend_otp', {
+    async resendOtp() {
+      try {
+        if (this.count == 0) {
+          await this.$axios.post('/users-permissions/resend_otp', {
             phone: this.login.phone
           })
-        },
+          this.count = 59;
+          let time = setInterval(() => {
+            if (this.count > 0 && 10 >= this.count) {
+              this.timer = '00:0'
+              this.count--
+            } else if (this.count > 0) {
+              this.count--
+            } else {
+              if (this.count === 0) {
+                clearInterval(time)
+              }
+            }
+          }, 1000)
+        }
+      } catch (e) {}
+    },
     async submitLogin() {
+      this.disabled = true
       try {
-       const {data:{jwt}}= await this.$auth.loginWith('local', { data: this.login })
-        this.$auth.setUserToken(jwt)
-        await this.$routePush({...this.$route.query,login: undefined})
-        await this.$toast.success('success Login')
+        if (this.disabled) {
+          const {data: { jwt }}= await this.$auth.loginWith('local', { data: this.login })
+          this.$auth.setUserToken(jwt)
+          this.isLogin = true
+          await this.$routePush({login: undefined})
+          await this.$toast.success('success Login')
+          await this.$store.dispatch('cart/getCardList')
+        }
       } catch (e) {
+        console.log(e)
         this.$toast.error(e, {
           duration: 2000,
           position: 'bottom-right',
         })
-        throw new Error(e)
+        setTimeout(() => {
+          this.disabled = false
+        }, 2000)
       }
     },
-    handalePhone() {
-      this.$routePush({...this.$route.query,login: 'otp'})
-      this.$axios.post('/users-permissions/send_otp', {
-        phone: this.login.phone
-      })
+    async handalePhone() {
+      try {
+        await this.$axios.post('/users-permissions/send_otp', {
+          phone: this.login.phone
+        })
+        this.isLogin = false
+      } catch (e) {}
     },
-    toRegister() {
-      this.$store.dispatch('loginModal', false)
-      this.$store.dispatch('registerModal', true)
+    close() {
+      this.$routePush({login: undefined})
+      this.isLogin = true
+      this.login.otp = ''
+      this.phone = ''
+    },
+    checkPhone(e) {
+      let el = e.target.value.trim()
+      if (el.length > 0 && el[0] !== '+') {
+        this.phone = '+998' + this.phone
+      }
+      this.login.phone = this.phone
     }
   }
 }
@@ -119,7 +177,6 @@ export default {
   top: 14px;
   right: 14px;
 }
-
 .login-modal {
   position: fixed;
   z-index: 5;
@@ -132,7 +189,6 @@ export default {
   transform: translate(-50%, -50%);
   border-radius: 16px;
 }
-
 @media screen and (max-width: 450px) {
   .login-modal {
     width: 96%;
