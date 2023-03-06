@@ -40,7 +40,7 @@
     </div>
     <div v-else class="main-styles pb-8">
       <!--  Banner  -->
-      <div class="container mx-auto py-8 xl:px-0 px-4 lg:block hidden">
+      <!-- <div class="container mx-auto py-8 xl:px-0 px-4 lg:block hidden">
         <div class="lg:flex lg:justify-center lg:gap-4">
           <banner-card
             :src="collections[0]?.banner?.url"
@@ -91,6 +91,12 @@
             status-style="text-green-600 bg-green-50"
             add-style="rwd-card flex shrink-0"
           />
+        </div>
+      </div> -->
+
+      <div class="container mx-auto py-8">
+        <div class="">
+
         </div>
       </div>
 
