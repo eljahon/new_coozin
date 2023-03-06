@@ -15,7 +15,7 @@ return {
   },
   methods: {
     onSubmit() {
-        this.$emit('isPhone', this.phone)
+      this.$emit('isPhone', this.phone)
     }
   }
 }
