@@ -126,7 +126,7 @@
             <nuxt-link  v-if="$auth.loggedIn" to="profile">
               <the-icon src="user"/>
             </nuxt-link>
-            <div v-else @click.stop="$router.push({ path: localePath($route.path), query: {...$route.query, login: 'login'}})">
+            <div v-else @click.stop="$routePush({...$route.query, login: 'login', maps: undefined})">
               <the-icon src="user"/>
             </div>
           </header-card>
@@ -244,19 +244,20 @@ export default {
     },
     async checkLogin () {
       if (this.$auth.state.loggedIn) {
-        const item = await this.$store.dispatch('cart/getCardList', {limit: 10,latitude: this.$store.state.location.latitude,
-          longitude: this.$store.state.location.longitude ,})
-        if (item.length) {
-          await this.$router.push({
-            path: this.localePath(this.$route.path),
-            query: {...this.$route.query, foodSaw: "multipleOrder"}
-          })
-        } else {
-          this.$toast.error('order not select', {
-            duration: 2000,
-            position: 'bottom-right',
+      const item = await this.$store.dispatch('cart/getCardList', {
+          populate: 'vendor, vendor.user, order_items',
+        locale: this.$i18n.locale
+        })
+        if (item.length && !this.$route.query.foodSaw) {
+          this.$routePush({
+            ...this.$route.query,
+            foodSaw: "multipleOrder",
+            login: undefined,
+            maps: undefined,
+            register: undefined
           })
         }
+
       } else {
         await this.$routePush({...this.$route.query, login: 'login',maps: undefined})
       }
