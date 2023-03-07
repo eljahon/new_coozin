@@ -92,7 +92,10 @@ export default {
       this.count--;
       }
     },
-   async decrement(){this.count++},
+   async decrement(){
+     this.count = this.item.min_amount
+     this.count++;
+   },
    async addCazinaOrder () {
   try {
     if(this.$auth.loggedIn) {
@@ -108,7 +111,14 @@ export default {
       }
       // await this.closeModal()
       //   .then(res => {
-          this.$store.dispatch('cart/newOrderCreate',newItem)
+         const data = await this.$store.dispatch('cart/newOrderCreate',newItem)
+      if(data) {
+        this.isSee()
+        await this.$store.dispatch('cart/getCardList', {
+          populate: 'vendor, vendor.user, order_items'
+        })
+      }
+
         // })
     } else {
       this.$toast.info(this.$t('you-are-login'))
