@@ -130,7 +130,9 @@ export default {
     }
   },
   mounted() {
-    this.isMapRender = true
+    setTimeout(() =>{
+      this.isMapRender = true
+    } ,0)
   }
 }
 </script>

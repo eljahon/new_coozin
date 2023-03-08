@@ -273,7 +273,10 @@ export default {
     }
   },
   watch: {
-    '$route.query': function (val) {
+    '$route.query.category_id': function (val) {
+      this.getVendors()
+    },
+    '$route.query.lat': function (val) {
       this.getVendors()
     },
   },

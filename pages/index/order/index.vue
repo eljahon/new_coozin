@@ -5,12 +5,12 @@
         <the-icon src="home" />
       </nuxt-link>
       <the-icon src="right-arrow-black" />
-      <span class="text-sm font-medium text-gray-500 cursor-pointer">Оформление заказа</span>
+      <span class="text-sm font-medium text-gray-500 cursor-pointer">{{$t('decor-order')}}</span>
     </div>
     <div class="container mx-auto flex gap-9 xl:px-0 xl:flex-nowrap	flex-wrap px-2">
       <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
       <form novalidate class="bg-white w-full p-6 rounded-2xl" @submit.prevent="handleSubmit(orderCreate)">
-        <h1 class="font-semibold text-gray-800 text-2xl">Оформление заказа</h1>
+        <h1 class="font-semibold text-gray-800 text-2xl">{{$t('decor-order')}}</h1>
         <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
           <div>
             <ValidationProvider
@@ -27,8 +27,8 @@
                   type="text"
                   icon="location"
                   name="address"
-                  :label="'Адрес доставки'"
-                  placeholder="улица Матонат, 35"
+                  :label="$t('delivery-place')"
+                  :placeholder="$t('matonat-street')+', 35'"
                   :value="order.address"
                 />
                 <div class="map-card" @click="openMaps">
@@ -44,7 +44,7 @@
             >
               <div class="flex flex-col gap-3 input-styles sm:w-96 w-80 input-400 mt-6">
 
-                <label for="dilevery-time" :class="errors.length ? 'text-red-500' : ''" class="font-medium text-gray-700">Время доставки</label>
+                <label for="dilevery-time" :class="errors.length ? 'text-red-500' : ''" class="font-medium text-gray-700">{{$t('time-delivery')}}</label>
 
                 <div class="relative">
                   <select
@@ -107,8 +107,8 @@
               type="text"
               icon="office"
               name="address"
-              label="Ориентир"
-              placeholder="улица Матонат, 35"
+              :label="$t('reference-point')"
+              :placeholder="$t('matonat-street')+', 35'"
               :v-model="order.address_comment"
             />
             <ValidationProvider
@@ -118,7 +118,7 @@
             mode='eager'
           >
             <div class="flex flex-col gap-3 input-styles sm:w-96 w-80 input-400 mt-6">
-              <label for="payment_type" :class="errors.length ? 'text-red-500' : ''" class="font-medium text-gray-700">Способ оплаты</label>
+              <label for="payment_type" :class="errors.length ? 'text-red-500' : ''" class="font-medium text-gray-700">{{$t('payment-method')}}</label>
               <div class="relative">
                 <select
                   class="bg-white w-full text-gray-500 border rounded-2xl border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
@@ -143,7 +143,7 @@
         <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
           <div class="flex items-center justify-between sm:w-96 w-80 input-400">
             <div class="flex items-center justify-center gap-3">
-              <h3>Повторный заказ</h3>
+              <h3>{{$t('reorder')}}</h3>
               <the-icon src="information-circle" width="20" height="20" />
             </div>
             <div class="container-switch">
@@ -177,36 +177,38 @@
           </div>
         </div>
         <div class="sm:w-96 w-full xl:m-0 mx-auto my-2">
-          <h3 class="text-lg font-semibold text-gray-700">К оплате</h3>
+          <h3 class="text-lg font-semibold text-gray-700">{{$t('to-pay')}}</h3>
           <div class="flex justify-between">
-            <h4 class="text-gray-600">Блюда</h4>
-            <h4 class="font-medium text-gray-600">{{$store.state.cart.cartItem.total_price}} сум</h4>
+            <h4 class="text-gray-600">{{$t('dishes')}}</h4>
+            <h4 class="font-medium text-gray-600">{{getCartItems.total_price}} {{$t('sum')}}</h4>
           </div>
           <div class="flex justify-between my-2">
-            <h4 class="text-gray-600">Доставка</h4>
-            <h4 class="font-medium text-gray-600"> {{$store.state.cart?.cartItem?.delivery_price ? $store.state.cart.cartItem.delivery_price : ' 10 000 +' }} сум</h4>
+            <h4 class="text-gray-600">{{$t('delivery')}}</h4>
+            <h4 class="font-medium text-gray-600"> {{getCartItems?.delivery_price ? getCartItems.delivery_price : ' 10 000 +' }} {{$t('sum')}}</h4>
           </div>
           <div class="flex justify-between">
-            <h4 class="font-bold text-gray-600">Итого</h4>
-            <h4 v-if="$store.state.cart?.cartItem?.delivery_price !== null" class="font-bold text-gray-600">{{Number($store.state.cart.cartItem.delivery_price)+Number($store.state.cart.cartItem.total_price) }} сум</h4>
-            <h4 v-else class="font-bold text-gray-600">{{Number($store.state.cart.cartItem.total_price)+10000 +"+" }} сум</h4>
+            <h4 class="font-bold text-gray-600">{{$t('total')}}</h4>
+            <h4 v-if="getCartItems?.delivery_price !== null" class="font-bold text-gray-600">{{Number(getCartItems?.delivery_price)+Number(getCartItems.total_price) }} {{$t('sum')}}</h4>
+            <h4 v-else class="font-bold text-gray-600">{{Number(getCartItems.total_price)+10000 +"+" }} {{$t('sum')}}</h4>
           </div>
         </div>
-        <button type="submit" class="w-full bg-gray-300 h-12 rounded-3xl text-gray-400 font-semibold mt-12 cursor-pointer">Оплатить</button>
+        <button type="submit" class="w-full bg-gray-300 h-12 rounded-3xl text-gray-400 font-semibold mt-12 cursor-pointer">{{$t('pay')}}</button>
       </form>
       </ValidationObserver>
 <!--      my order list -->
       <div class="bg-white xl:w-80 w-full rounded-2xl px-2 py-4 flex flex-col gap-3 shrink-0">
-        <h2 class="font-semibold text-gray-800 text-2xl mx-2">Ваш заказ</h2>
+        <h2 class="font-semibold text-gray-800 text-2xl mx-2">{{$t('your-order')}}</h2>
         <div class="flex flex-col gap-3 overflow-y-scroll scroll-style pl-2 pr-4" style="max-height: 516px;">
-          <div v-for="item in $store.state.cart?.cartItem?.items">
-            <div class="flex gap-4">
-              <div class="w-24 h-24 overflow-hidden border border-gray-100 rounded-lg">
-                <img class="w-full" src="../../../assets/img/img-1.jpg" alt="Food Image">
-              </div>
-              <div class="flex flex-col gap-1">
-                <h4 class="font-normal text-gray-700">{{item.food.name}}</h4>
-                <h4 class="font-bold text-gray-700">{{item.quantity}}х{{item.food.price}} сум</h4>
+          <div v-if="getCartItems && getCartItems.items && getCartItems.items.length">
+            <div v-for="item in getCartItems.items">
+              <div class="flex gap-4">
+                <div class="w-24 h-24 overflow-hidden border border-gray-100 rounded-lg">
+                  <img class="w-full" :src="$img+item.image" alt="Food Image">
+                </div>
+                <div class="flex flex-col gap-1">
+                  <h4 class="font-normal text-gray-700">{{item.name}}</h4>
+                  <h4 class="font-bold text-gray-700">{{item.count}}х{{item.price}} {{$t('sum')}}</h4>
+                </div>
               </div>
             </div>
           </div>
@@ -220,6 +222,7 @@
 
 <script>
 import cardsFormModal from "@/components/card-modal/cards-form-modal";
+import {mapGetters} from "vuex";
 export default {
   components: {
     cardsFormModal
@@ -231,6 +234,7 @@ export default {
         {value: 'card', label:'card'},
         {value: 'balance', label:'balance'},
       ],
+      isRendor: false,
       isAdders: true,
       timeList: [],
       order: {
@@ -256,11 +260,11 @@ export default {
     await this.getOrderItem()
     await this.getDate()
   },
- async mounted() {
-    if(this.$store?.state?.location?.longitude) {
-      await this.orderTimeDelever()
-    }
-  },
+ // async mounted() {
+ //    if(this.$store?.state?.location?.longitude) {
+ //      await this.orderTimeDelever()
+ //    }
+ //  },
   watch: {
     'order.payment_type': function (val) {
       if (val === 'card') {
@@ -328,9 +332,9 @@ export default {
         console.log(err)
       }
    },
-    async getOrderItem (longitude,latitude) {
+    async getOrderItem () {
       await this.$store.dispatch('cart/getCardItem',
-        this.lotLang(longitude, latitude))
+        {id:this.$route.query.order_id, locale: this.$i18n.locale})
     },
     lotLang(longitude,latitude) {
     return   {id: this.$route.query.order_id,
@@ -356,6 +360,14 @@ export default {
       };
 
     }
+  },
+  computed: {
+    ...mapGetters('cart', ['getCartItems'])
+  },
+  mounted() {
+    setTimeout(() => {
+      this.isRendor = true
+    }, 0)
   }
 }
 </script>

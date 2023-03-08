@@ -142,7 +142,7 @@
 
     <!--  Order Modal  -->
     <the-modal />
-    <the-modal-maps @changePlice="changePlace"/>
+<!--    <the-modal-maps @changePlice="changePlace"/>-->
     <burger-menu />
   </div>
 </template>
@@ -164,7 +164,7 @@ export default {
       searchFoods: '',
       langList: [],
       langlot: null,
-      locationName: null
+      locationName: ''
     }
   },
   components: {
@@ -185,9 +185,6 @@ export default {
     }
   },
   computed: {
-    locationName () {
-      return this.$store.state.locatinsName
-    },
     menu_burger () {
       return this.$store.state.burger
     },

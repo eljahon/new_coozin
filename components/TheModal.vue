@@ -21,7 +21,7 @@
             </div>
             <div class="flex items-center gap-2">
               <div class="flex flex-shrink-0"><the-icon src="cash"/></div>
-              <span class="font-semibold text-sm">{{ item?.total_price }} сум</span>
+              <span class="font-semibold text-sm">{{ item?.total_price }} {{$t('sum')}}</span>
             </div>
           </div>
           <button @click.stop="deleteOrder(item)" class="delete_button"><the-icon class="cursor-pointer flex flex-shrink-0 w-5" src="trash-gray"/></button>
@@ -34,7 +34,7 @@
           <the-icon src="arrow-left" class="cursor-pointer"/>
         </div>
         <h3 class="text-gray-800 text-xl font-bold">{{ $t('basket') }} №{{ ' ' + $route.query?.carNumber }}</h3>
-        <button @click.stop="deleteOrder($store.state.cart?.cartItem?.id)">
+        <button @click.stop="deleteOrder(getCartItems?.id)">
           <the-icon class="cursor-pointer" src="trash-gray"/>
         </button>
       </div>
@@ -44,44 +44,47 @@
           {{ $t('your-order-vendor') }}
           <br>
 
-          <span v-if="$store.state.cart.cartItem?.full_name&&$store.state.cart?.cartItem" class="text-orange-600">{{$store.state.cart.cartItem.full_name}}</span>
+          <span v-if="getCartItems && getCartItems.full_name" class="text-orange-600">{{getCartItems.full_name}}</span>
           <span v-else class="text-orange-600">{{$t('not-vendor_name')}}</span>
         </h4>
         <div class="w-14 h-14 flex-shrink flex rounded-full overflow-hidden border-2 border-orange-100">
-          <img v-if="$store.state.cart.cartList?.vendor_img" class="w-full object-cover" :src="$img+$store.state.cart.cartList.vendor_img" alt="Avatar Chef">
+          <img v-if="getVendors?.vendor_img" class="w-full object-cover" :src="$img+getVendors.vendor_img" alt="Avatar Chef">
           <img class="w-full object-cover" src="../assets/img/vendor.png" alt="Avatar Chef">
         </div>
       </div>
-<!--      <div v-if="$store.state.cart.cartItem.items" class="mt-4 flex flex-col gap-4" v-for="(item, index) in $store.state.cart.cartItem.items">-->
-<!--        <div class="flex gap-5">-->
-<!--          <div class="w-24 h-24 rounded-lg overflow-hidden flex shrink-0">-->
-<!--            <img class="w-full object-cover" src="https://picsum.photos/100" alt="Food Photo">-->
-<!--          </div>-->
-<!--          <div class="flex items-center justify-between w-full">-->
-<!--            <div class="flex flex-col justify-between gap-4">-->
-<!--              <div>-->
-<!--                <h4 class="text-gray-700">{{ item?.food?.name }}</h4>-->
-<!--                <h4 class="font-bold text-gray-700">{{ item?.food?.price }} {{ $t('sum') }}</h4>-->
+      <div v-if="getCartItems?.items?.length">
+        <div  class="mt-4 flex flex-col gap-4" v-for="(item, index) in getCartItems.items">
+          <div class="flex gap-5">
+            <div class="w-24 h-24 rounded-lg overflow-hidden flex shrink-0">
+              <img class="w-full object-cover" :src="$img+item.image" alt="Food Photo">
+            </div>
+            <div class="flex items-center justify-between w-full">
+              <div class="flex flex-col justify-between gap-4">
+                <div>
+                  <h4 v-if="item && item.name" class="text-gray-700">{{ item.name }}</h4>
+                  <h4 class="font-bold text-gray-700">{{ item?.price }} {{ $t('sum') }}</h4>
 
-<!--              </div>-->
-<!--              <div class="flex gap-3 items-center">-->
-<!--                <button :disabled="isDisbale" @click.stop="increment(item)"-->
-<!--                     class="w-7	h-7 rounded bg-gray-200 flex items-center justify-center cursor-pointer">-->
-<!--                  <span class="line"></span>-->
-<!--                </button>-->
-<!--                <span class="font-semibold text-gray-700">{{ item.quantity }}</span>-->
-<!--                <button :disabled="isDisbale" @click.stop="decrement(item)"-->
-<!--                     class="w-7	h-7 rounded bg-gray-200 flex items-center justify-center cursor-pointer">-->
-<!--                  <span class="text-gray-700 text-3xl leading-none -translate-y-1">+</span>-->
-<!--                </button>-->
-<!--              </div>-->
-<!--            </div>-->
-<!--            <div @click.stop="itemOrderRemove(item.id)">-->
-<!--              <the-icon class="flex shrink-0 cursor-pointer" src="dark-x"/>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
+                </div>
+                <div class="flex gap-3 items-center">
+                  <button :disabled="isDisbale" @click.stop="increment(item)"
+                          class="w-7	h-7 rounded bg-gray-200 flex items-center justify-center cursor-pointer">
+                    <span class="line"></span>
+                  </button>
+                  <span class="font-semibold text-gray-700">{{ item.count }}</span>
+                  <button :disabled="isDisbale" @click.stop="decrement(item)"
+                          class="w-7	h-7 rounded bg-gray-200 flex items-center justify-center cursor-pointer">
+                    <span class="text-gray-700 text-3xl leading-none -translate-y-1">+</span>
+                  </button>
+                </div>
+              </div>
+              <div @click.stop="itemOrderRemove(item)">
+                <the-icon class="flex shrink-0 cursor-pointer" src="dark-x"/>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
       <div
         @click="comment = true"
         style="box-shadow: -5px 2px 20px -11px rgba(0, 0, 0, 0.14);"
@@ -141,7 +144,7 @@
         </div>
       </div>
       <button @click.stop="orderListSee" class="w-full text-white bg-orange-600 py-3 rounded-3xl font-semibold mt-8">
-        {{ formatPrice($store.state.cart.cartItem) }} сум перейти к оплате
+        {{ formatPrice(getCartItems) }} {{$t('sum')}} {{$t('proceed-checkout')}}
       </button>
     </div>
     <div v-if="$route.query.foodSaw" class="modal-background" @click="closeModal"></div>
@@ -150,9 +153,7 @@
 
 <script>
 import {mapGetters} from "vuex";
-
 export default {
-  props: ['foodDetail'],
   data() {
     return {
       comment: false,
@@ -203,7 +204,7 @@ export default {
     orderListSee() {
       if (this.comment_text) {
         this.$router.push({path: this.localePath('/order'),
-          query: {comment_text: this.comment_text , order_id: this.$route.query.order_id}})
+          query: {comment_text: this.comment_text , order_id: this.$route.query.cart_id}})
       } else {
         this.comment = !this.comment;
         setTimeout(() => {
@@ -227,20 +228,20 @@ export default {
     isComment () {
       this.comment = !this.comment
     },
-    itemOrderRemove(item) {
-      const orderRemove = {
-        order_id: this.$route.query.order_id,
-        id: item,
-        latitude: this.$store?.state?.location?.latitude,
-        longitude: this.$store?.state?.location?.longitude
-      }
-      this.$store.dispatch('cart/removeCartItem', orderRemove)
+    async itemOrderRemove(item) {
+    try {
+      await this.$store.dispatch('cart/removeCartItem',item.id)
+      await this.getCartItemList()
+    } catch (err) {
+      this.$toast.error(err)
+    }
     },
     async decrement(item) {
-      this.isDisbale = !this.isDisbale
-      await this.$store.dispatch('cart/newOrderCreate', this.dataFormat({data: item, method: 'dec'}))
-      await this.getCartItemList(this.$route.query.order_id)
-      this.isDisbale = !this.isDisbale
+      console.log(item)
+      // this.isDisbale = !this.isDisbale
+      // await this.$store.dispatch('cart/newOrderCreate', this.dataFormat({data: item, method: 'dec'}))
+      // await this.getCartItemList(this.$route.query.order_id)
+      // this.isDisbale = !this.isDisbale
       // await this.$store.dispatch('cart/getCardItem', {id: this.$route.query.order_id, })
     },
     async increment(item) {
@@ -251,12 +252,9 @@ export default {
 
     },
     async  getCartItemList (id) {
-      console.log(this.$route.query)
   const data = await this.$store.dispatch('cart/getCardItem',
     {id:id ?? this.$route.query.cart_id,
-    locale: this.$i18n.locale,
-      populate: 'order_items, vendor, vendor.user, vendor.user.avatar, order_items.product,order_items.product.media'});
-      console.log(data)
+    locale: this.$i18n.locale});
   return data;
   },
     dataFormat(item) {
@@ -273,10 +271,11 @@ export default {
       }
     },
     async deleteOrder(item) {
-      const {id} =item;
+      const {cart_id, cart_number} =item;
       try {
-        if (id) {
-          await this.$store.dispatch('cart/removeCart', id)
+        if (cart_id) {
+          await this.$store.dispatch('cart/removeCart', cart_id)
+          this.$toast.info(`${this.$t('cart-delete')} ${this.$t('cart-number')} ${cart_number}`)
           await this.getCartList()
         } else {
           await this.$store.dispatch('cart/removeCart', item)
@@ -311,9 +310,9 @@ export default {
         register: undefined})
     },
   },
-  // computed: {
-  //   ...mapGetters(['getCartItem'])
-  // }
+  computed: {
+    ...mapGetters('cart',['getCartItems', 'getVendors'])
+  }
 }
 </script>
 
