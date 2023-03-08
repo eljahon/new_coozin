@@ -22,7 +22,7 @@
               <the-icon :src="search ? 'x' : 'search'"/>
             </header-card>
           </div>
-          <div v-if="!search" class="md:flex hidden" @click="modal = true">
+          <div v-if="!search" class="md:flex hidden" @click="openModalYandexMpas">
             <the-input
               type="text"
               :placeholder="$t('my_place')"
@@ -32,18 +32,18 @@
               :value="locationName"
             />
           </div>
-          <div v-if="!search" class="relative">
-            <div v-if="modal" class="absolute position z-10 top-12 bg-white p-3 rounded-2xl border border-gray-300 flex flex-col gap-3">
-              <div class="flex justify-between gap-1">
-                <h3 class="text-gray-800 font-semibold">{{ $t('you-in') + " " + $store.state.locatinsName | location }}</h3>
-                <span @click="modal=false"><the-icon width="30px" class="mt-1 mr-1 cursor-pointer flex shrink-0" src="x"></the-icon></span>
-              </div>
-              <div class="flex items-center gap-3 mx-auto">
-                <button @click="locations" class="bg-orange-600 p-3 text-white w-40 rounded-3xl">{{ $t('yes-right') }}</button>
-                <button @click="openModalYandexMpas" class="bg-gray-300 p-3 text-gray-600 w-40 rounded-3xl">{{ $t('you-wrong') }}</button>
-              </div>
-            </div>
-          </div>
+<!--          <div v-if="!search" class="relative">-->
+<!--            <div v-if="modal" class="absolute position z-10 top-12 bg-white p-3 rounded-2xl border border-gray-300 flex flex-col gap-3">-->
+<!--              <div class="flex justify-between gap-1">-->
+<!--                <h3 class="text-gray-800 font-semibold">{{ $t('you-in') + " " + $store.state.locatinsName | location }}</h3>-->
+<!--                <span @click="modal=false"><the-icon width="30px" class="mt-1 mr-1 cursor-pointer flex shrink-0" src="x"></the-icon></span>-->
+<!--              </div>-->
+<!--              <div class="flex items-center gap-3 mx-auto">-->
+<!--                <button @click="locations" class="bg-orange-600 p-3 text-white w-40 rounded-3xl">{{ $t('yes-right') }}</button>-->
+<!--                <button @click="openModalYandexMpas" class="bg-gray-300 p-3 text-gray-600 w-40 rounded-3xl">{{ $t('you-wrong') }}</button>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
         </div>
         <input
           v-if="search"
@@ -163,7 +163,8 @@ export default {
       search: false,
       searchFoods: '',
       langList: [],
-      langlot: null
+      langlot: null,
+      locationName: null
     }
   },
   components: {
@@ -234,6 +235,7 @@ export default {
     },
     changePlace(listPlice) {
       this.address = listPlice.fullName;
+      this.locationName = listPlice.fullName
       this.langlot= {
         latitude: listPlice?.getNames[0]?.latitude,
         longitude: listPlice?.getNames[0]?.longitude
@@ -243,12 +245,12 @@ export default {
       // window.location.reload()
     },
     async checkLogin () {
-      if (this.$auth.state.loggedIn) {
+      if (this.$auth.state.loggedIn && !this.$route.query.foodSaw) {
       const item = await this.$store.dispatch('cart/getCardList', {
           populate: 'vendor, vendor.user, order_items',
         locale: this.$i18n.locale
         })
-        if (item.length && !this.$route.query.foodSaw) {
+        if (item.length) {
           this.$routePush({
             ...this.$route.query,
             foodSaw: "multipleOrder",
@@ -259,7 +261,12 @@ export default {
         }
 
       } else {
-        await this.$routePush({...this.$route.query, login: 'login',maps: undefined})
+        if (this.$route.query.foodSaw === "multipleOrder" || this.$route.query.foodSaw === 'detailOrder') {
+          await this.$routePush({...this.$route.query,maps: undefined, foodSaw: undefined, login: undefined})
+
+        } else {
+          await this.$routePush({...this.$route.query, login: 'login',maps: undefined})
+        }
       }
     },
   async  handleLang(item) {

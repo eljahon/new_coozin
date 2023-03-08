@@ -78,7 +78,7 @@
         <div class="switch-item delay-300"
              :class="{ 'switch-right': switchOn, 'switch-left': !switchOn }"></div>
         <div>
-          <span :class="{'text-orange-600': !switchOn, 'text-gray-500': switchOn}">Меню</span>
+          <span :class="{'text-orange-600': !switchOn, 'text-gray-500': switchOn}">{{$t('menu')}}</span>
         </div>
         <div>
           <span :class="{'text-orange-600': switchOn, 'text-gray-500': !switchOn}">Лента</span>
@@ -96,6 +96,7 @@
         />
       </div>
     </div>
+    <loading-cart-loading v-if="$fetchState.pending || loading"/>
     <div v-if="!switchOn">
       <div class="container mx-auto xl:px-0 sm:px-4 px-2">
         <div class="flex flex-wrap justify-center items-center sm:gap-4 gap-2 w-full">
@@ -181,6 +182,7 @@ export default {
       categories: null,
       total: null,
       foodDetail: {},
+      loading: false,
       coor: [],
       productData: [],
       isPageCount: false,
@@ -272,6 +274,7 @@ export default {
     },
     async getFood() {
     try {
+      this.loading = true
       const _params = {...this.$route.query}
       const {data: {results, pagination}} = await this.$axios.get('products', {
         params: {
@@ -298,8 +301,10 @@ export default {
       }
       this.foods = results;
       this.total = pagination.total;
+      this.loading = false;
       return results;
     } catch(err){
+      this.loading = false;
       throw new Error(err)
     }
     },

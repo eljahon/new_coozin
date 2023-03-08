@@ -100,7 +100,7 @@ export default {
   try {
     if(this.$auth.loggedIn) {
       const newItem = {
-        vendor: this.$route.query.vendor_id,
+        vendor: this.item.vendor.id,
         user: this.$auth.user.id,
         items: [
           {

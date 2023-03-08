@@ -4,35 +4,44 @@
     <div v-if="pending">
       <div class="main-styles py-4">
         <div class="container mx-auto xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
         </div>
         <div class="container mx-auto py-6 xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
         </div>
         <div class="container mx-auto xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
-          <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+          <div role="status"
+               class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
             <span class="sr-only">Loading...</span>
           </div>
         </div>
@@ -101,22 +110,22 @@
             <a href="#menu">{{ $t('menu') }}</a>
           </h2>
           <div class="flex items-center gap-1">
-<!--            <span class="font-normal text-orange-600 cursor-pointer">{{ $t('see-more') }}</span>-->
-<!--            <the-icon src="right-arrow" />-->
+            <!--            <span class="font-normal text-orange-600 cursor-pointer">{{ $t('see-more') }}</span>-->
+            <!--            <the-icon src="right-arrow" />-->
           </div>
         </div>
       </div>
-<!--      <div class="container mx-auto overflow-x-scroll scroll-style xl:px-0 sm:px-4 px-2">-->
-<!--        <div class="flex items-center sm:gap-3.5 gap-2">-->
-<!--          <div v-for="item in $store.state.days_list">-->
-<!--            <menu-card-->
-<!--              :date="item"-->
-<!--              :month="item.month"-->
-<!--              @onDates="onDatesFilter"-->
-<!--            />-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--      <div class="container mx-auto overflow-x-scroll scroll-style xl:px-0 sm:px-4 px-2">-->
+      <!--        <div class="flex items-center sm:gap-3.5 gap-2">-->
+      <!--          <div v-for="item in $store.state.days_list">-->
+      <!--            <menu-card-->
+      <!--              :date="item"-->
+      <!--              :month="item.month"-->
+      <!--              @onDates="onDatesFilter"-->
+      <!--            />-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </div>-->
       <div class="container mx-auto overflow-x-scroll scroll-style my-3 xl:px-0 sm:px-4 px-2">
         <div class="flex items-center sm:gap-4 gap-2 w-full">
           <category-card
@@ -131,6 +140,58 @@
 
       <div class="container mx-auto xl:px-0 sm:px-4 px-2">
         <div class="flex flex-wrap justify-center items-center sm:gap-4 gap-2 w-full">
+          <!--          <Loader :active="loading" />-->
+          <div v-if="loading">
+            <div class="main-styles py-4">
+              <div class="container mx-auto xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">
+                <div role="status"
+                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <div role="status"
+                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <div role="status"
+                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <div role="status"
+                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+              <div class="container mx-auto py-6 xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">
+                <div role="status"
+                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <div role="status"
+                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <div role="status"
+                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+                  <span class="sr-only">Loading...</span>
+                </div>
+                <div role="status"
+                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
+                  <span class="sr-only">Loading...</span>
+                </div>
+              </div>
+              <!--              <div class="container mx-auto xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">-->
+              <!--                <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">-->
+              <!--                  <span class="sr-only">Loading...</span>-->
+              <!--                </div>-->
+              <!--                <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">-->
+              <!--                  <span class="sr-only">Loading...</span>-->
+              <!--                </div>-->
+              <!--                <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">-->
+              <!--                  <span class="sr-only">Loading...</span>-->
+              <!--                </div>-->
+              <!--              </div>-->
+            </div>
+          </div>
           <VendorCard
             v-for="(item, idx) in vendorData"
             :key="idx"
@@ -161,7 +222,7 @@
           </h2>
           <div class="flex items-center gap-1">
             <nuxt-link class="font-normal text-orange-600 cursor-pointer" to="/blog">{{ $t('see-more') }}</nuxt-link>
-            <the-icon src="right-arrow" />
+            <the-icon src="right-arrow"/>
           </div>
         </div>
       </div>
@@ -177,314 +238,345 @@
         </div>
       </div>
 
-<!--      <Loader :active="$store.state.loader" />-->
+      <!--      <Loader :active="$store.state.loader" />-->
     </div>
   </div>
 </template>
 
 <script>
 import {mapGetters} from "vuex"
-  export default {
+
+export default {
   auth: false,
-    data() {
-      return {
-        location: false,
-        more: false,
-        pending: false,
-        menuCard: [],
-        vendorData: null,
-        isPageCount: false,
-        page: 2,
-        locations: null,
-        blogCard: [],
-        categories: [],
-        vendors: [],
-        collections: [],
-        renderCount: 0,
-        limit: 8,
-        total: 0,
-        pagination: {
-          page: 1,
-          pageSize: 8
-        },
-      }
+  data() {
+    return {
+      location: false,
+      more: false,
+      pending: false,
+      loading: false,
+      menuCard: [],
+      vendorData: null,
+      isPageCount: false,
+      page: 2,
+      locations: null,
+      blogCard: [],
+      categories: [],
+      vendors: [],
+      collections: [],
+      renderCount: 0,
+      limit: 8,
+      total: 0,
+      pagination: {
+        page: 1,
+        pageSize: 8
+      },
+    }
+  },
+  watch: {
+    '$route.query': function (val) {
+      this.getVendors()
     },
-    // watch: {
-    //   '$route.query': async  function (val) {
-    //     const today= this.$dayjs(new Date()).format('YYYY-MM-DD')
-    //     if (val.day === today) {
-    //       this.$routePush({...this.$route.query, day: undefined})
-    //       await this.getVendors(1)
-    //       await this.getVendors(2)
-    //     }
-    //     await this.getVendors(1)
-    //   }
-    // },
-    async fetch() {
+  },
+  async fetch() {
+    try {
+      await this.getCollection()
+      await this.getCategories()
+      await this.getDate()
+      await this.getVendors()
+      await this.getReels()
+    } catch (err) {
+      throw new Error(err)
+    }
+  },
+  methods: {
+    async getCategories() {
       try {
-        await this.getCollection()
-        await this.getCategories()
-        await this.getDate()
-        await this.getVendors()
-        await this.getReels()
+        const {data: {results, pagination}} = await this.$axios.get('categories', {
+          params: {
+            populate: '*',
+            locale: this.$i18n.locale
+          }
+        })
+        this.categories = results;
+        this.categories.unshift(this.$i18n.locale === 'uz' ? {name: 'Hammasi', id: 'all'} : {name: 'Все', id: 'all'})
+
       } catch (err) {
         throw new Error(err)
       }
     },
-    methods: {
-      async getCategories(){
-        try {
-       const {data: {results, pagination}} = await this.$axios.get('categories', {
-         params: {
-           populate: '*',
-           locale: this.$i18n.locale
-         }
-       })
-          this.categories = results;
-       this.categories.unshift(this.$i18n.locale === 'uz' ? {name: 'Hammasi', id: 'all'} : {name: 'Все', id: 'all'})
-
-        } catch (err) {
-          throw new Error(err)
-        }
-      },
-      async getCollection() {
-        try {
-          this.pending = true
-          const {data: {results, pagination}} = await this.$axios.get('service-collections', {
-            locale: this.$i18n.locale
-          })
-          this.collections = results
-        } catch (err) {
-          return err
-        }
-      },
-    async  getVendors() {
-     try {
+    async getCollection() {
+      try {
+        this.pending = true
+        const {data: {results, pagination}} = await this.$axios.get('service-collections', {
+          locale: this.$i18n.locale
+        })
+        this.collections = results
+      } catch (err) {
+        return err
+      }
+    },
+    async getVendors() {
+      try {
+        const _query = {...this.$route.query}
+        this.loading = true
         const {data: {results, pagination}} = await this.$axios.get('vendors/all', {
           params: {
             populate: "passport, patent, background, user, user.avatar, *",
             locale: this.$i18n.locale,
             pagination: this.pagination,
+            lot: this.$route.query.lat ?? undefined,
+            long: this.$route.query.long ?? undefined,
             filters: {
               categories: {
                 id: {
-                  $eq: this.$route.query.category_id ?? undefined
+                  $eq: _query.category_id
                 }
               },
-              verified: {$eq: true}
+              verified: {$eq: true},
             }
           }
         });
         this.vendorData = results
+        this.loading = false
         this.total = pagination.total;
-      } catch(err) {
-       throw new Error(err)
-     }
-      },
-      async getReels() {
-        try {
-          const {data: {results, pagination}} =  await this.$axios.get('reels', {
-            params: {
-              populate: 'image, vendor, background, vendor.user, vendor.background, vendor.user.avatar',
-              locale: this.$i18n.locale
-            }
-          });
-          this.blogCard = results
-        } catch (err) {
-          throw new Error(err)
-        }
-      },
-      async onDatesFilter (item) {
-        // this.$routePush({...this.$route.query, day: item.day})
-        // this.getVendors()
-      },
-      async getDate () {
-        return this.$store.dispatch('set_day').then(res => this.pending = false)
-      },
-      categoriesFilter (item) {
-        if (item.category_id === 'all') {
-          this.$routePush({...this.$route.query,category_id: undefined})
-        } else {
-          this.$routePush({...this.$route.query, ...item})
-        }
-        this.getVendors()
-      },
-     async pageCount () {
-    try {
-      if(this.pagination.pageSize < this.total) {
-        this.isPageCount = true;
-        this.pagination.pageSize+=4
-        await this.getVendors()
-        this.isPageCount = false;
-      } else {
-        this.isPageCount = true
+      } catch (err) {
+        this.loading = false
+        throw new Error(err)
       }
-    } catch(err) {
-      throw new Error(err)
-    }
-
-     }
+    },
+    async getReels() {
+      try {
+        const {data: {results, pagination}} = await this.$axios.get('reels', {
+          params: {
+            populate: 'image, vendor, background, vendor.user, vendor.background, vendor.user.avatar',
+            locale: this.$i18n.locale
+          }
+        });
+        this.blogCard = results
+      } catch (err) {
+        throw new Error(err)
+      }
+    },
+    async onDatesFilter(item) {
+      // this.$routePush({...this.$route.query, day: item.day})
+      // this.getVendors()
+    },
+    async getDate() {
+      return this.$store.dispatch('set_day').then(res => this.pending = false)
+    },
+    categoriesFilter(item) {
+      // this.getVendors(item.category_id)
+      if (item.category_id === 'all') {
+        this.$routePush({...this.$route.query, category_id: undefined})
+      } else {
+        this.$routePush({...this.$route.query, category_id: item.category_id});
+      }
 
     },
-    computed: {
-      ...mapGetters(['get_days_list']),
-    },
-    mounted() {
-      this.location = true;
-      this.$bridge.$on('vendor_fetch', async (message) => {
-        this.locations = message;
-        await this.getVendors()
+    async pageCount() {
+      try {
+        if (this.pagination.pageSize < this.total) {
+          this.isPageCount = true;
+          this.pagination.pageSize += 4
+          await this.getVendors()
+          this.isPageCount = false;
+        } else {
+          this.isPageCount = true
+        }
+      } catch (err) {
+        throw new Error(err)
+      }
 
-      })
     }
+
+  },
+  computed: {
+    ...mapGetters(['get_days_list']),
+  },
+  mounted() {
+    this.location = true;
+    this.$bridge.$on('vendor_fetch', async (message) => {
+      this.locations = message;
+      console.log(message)
+      // await this.getVendors()
+
+    })
   }
+}
 </script>
 
 
-
-
-
-
 <style scoped>
-  .scroll-style::-webkit-scrollbar {
-    height: 0;
-    border-radius: 24px;
-  }
-  .scroll-style::-webkit-scrollbar-track {
-    background: #f1f1f1;
-  }
-  .scroll-style::-webkit-scrollbar-thumb {
-    background: #888;
-  }
-  .scroll-style::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
+.scroll-style::-webkit-scrollbar {
+  height: 0;
+  border-radius: 24px;
+}
+
+.scroll-style::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.scroll-style::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+.scroll-style::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.card-1 {
+  width: 312px;
+  height: 330px;
+}
+
+.card-2 {
+  width: 384px;
+  height: 154px;
+}
+
+.card-3 {
+  width: 488px;
+  height: 154px;
+}
+
+.card-4 {
+  width: 472px;
+  height: 160px;
+}
+
+.card-5 {
+  width: 400px;
+  height: 160px;
+}
+
+.rwd-card {
+  width: 320px;
+  height: 180px;
+}
+
+.main-styles {
+  background: #F3F4F6;
+}
+
+@media screen and (max-width: 1280px) {
   .card-1 {
-    width: 312px;
+    width: 280px;
     height: 330px;
   }
+
   .card-2 {
-    width: 384px;
+    width: 360px;
     height: 154px;
-  }
-  .card-3 {
-    width: 488px;
-    height: 154px;
-  }
-  .card-4 {
-    width: 472px;
-    height: 160px;
-  }
-  .card-5 {
-    width: 400px;
-    height: 160px;
-  }
-  .rwd-card {
-    width: 320px;
-    height: 180px;
-  }
-  .main-styles {
-    background: #F3F4F6;
   }
 
-  @media screen and (max-width: 1280px) {
-    .card-1 {
-      width: 280px;
-      height: 330px;
-    }
-    .card-2 {
-      width: 360px;
-      height: 154px;
-    }
-    .card-3 {
-      width: 460px;
-      height: 154px;
-    }
-    .card-4 {
-      width: 450px;
-      height: 160px;
-    }
-    .card-5 {
-      width: 370px;
-      height: 160px;
-    }
+  .card-3 {
+    width: 460px;
+    height: 154px;
   }
-  @media screen and (max-width: 1150px) {
-    .card-2 {
-      width: 340px;
-      height: 154px;
-    }
-    .card-3 {
-      width: 440px;
-      height: 154px;
-    }
-    .card-4 {
-      width: 430px;
-      height: 160px;
-    }
-    .card-5 {
-      width: 350px;
-      height: 160px;
-    }
+
+  .card-4 {
+    width: 450px;
+    height: 160px;
   }
-  @media screen and (max-width: 1100px) {
-    .card-2 {
-      width: 330px;
-      height: 154px;
-    }
-    .card-3 {
-      width: 430px;
-      height: 154px;
-    }
-    .card-4 {
-      width: 420px;
-      height: 160px;
-    }
-    .card-5 {
-      width: 340px;
-      height: 160px;
-    }
+
+  .card-5 {
+    width: 370px;
+    height: 160px;
   }
-  @media screen and (max-width: 1080px) {
-    .card-2 {
-      width: 325px;
-      height: 154px;
-    }
-    .card-3 {
-      width: 415px;
-      height: 154px;
-    }
-    .card-4 {
-      width: 405px;
-      height: 160px;
-    }
-    .card-5 {
-      width: 325px;
-      height: 160px;
-    }
+}
+
+@media screen and (max-width: 1150px) {
+  .card-2 {
+    width: 340px;
+    height: 154px;
   }
-  @media screen and (max-width: 1050px) {
-    .card-2 {
-      width: 315px;
-      height: 154px;
-    }
-    .card-3 {
-      width: 400px;
-      height: 154px;
-    }
-    .card-4 {
-      width: 390px;
-      height: 160px;
-    }
-    .card-5 {
-      width: 315px;
-      height: 160px;
-    }
+
+  .card-3 {
+    width: 440px;
+    height: 154px;
   }
-  @media screen and (max-width: 500px) {
-    .rwd-card {
-      width: 280px;
-      height: 160px;
-    }
+
+  .card-4 {
+    width: 430px;
+    height: 160px;
   }
+
+  .card-5 {
+    width: 350px;
+    height: 160px;
+  }
+}
+
+@media screen and (max-width: 1100px) {
+  .card-2 {
+    width: 330px;
+    height: 154px;
+  }
+
+  .card-3 {
+    width: 430px;
+    height: 154px;
+  }
+
+  .card-4 {
+    width: 420px;
+    height: 160px;
+  }
+
+  .card-5 {
+    width: 340px;
+    height: 160px;
+  }
+}
+
+@media screen and (max-width: 1080px) {
+  .card-2 {
+    width: 325px;
+    height: 154px;
+  }
+
+  .card-3 {
+    width: 415px;
+    height: 154px;
+  }
+
+  .card-4 {
+    width: 405px;
+    height: 160px;
+  }
+
+  .card-5 {
+    width: 325px;
+    height: 160px;
+  }
+}
+
+@media screen and (max-width: 1050px) {
+  .card-2 {
+    width: 315px;
+    height: 154px;
+  }
+
+  .card-3 {
+    width: 400px;
+    height: 154px;
+  }
+
+  .card-4 {
+    width: 390px;
+    height: 160px;
+  }
+
+  .card-5 {
+    width: 315px;
+    height: 160px;
+  }
+}
+
+@media screen and (max-width: 500px) {
+  .rwd-card {
+    width: 280px;
+    height: 160px;
+  }
+}
 </style>

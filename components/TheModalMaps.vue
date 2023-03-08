@@ -4,7 +4,7 @@
     <div class="multiple-modal 1">
       <span class="flex flex-col mb-2">
         <div class="flex items-center justify-between mb-3">
-          <h2>Укажите адрес доставки</h2>
+          <h2>{{$t('delivery-address')}}</h2>
           <span @click="$routePush({...$route.query,maps: undefined})">
             <the-icon
               class="cursor-pointer"
@@ -16,8 +16,8 @@
         </div>
         <div class="flex items-center justify-between gap-3">
           <button @click="myLocations"
-                  class="sm:flex hidden text-white p-2 rounded-2xl bg-orange-500">Определить</button>
-          <div class="w-full">
+                  class="sm:flex text-sm hidden text-white p-1 rounded-2xl bg-orange-500">{{$t('my-address')}}</button>
+          <div class="w-3/4 m-auto">
             <input
               class="w-full p-2 rounded-2xl bg-white outline-orange-500 border border-gray-200"
               type="text"
@@ -97,7 +97,8 @@ export default {
       this.markerIcon = [locations.latitude, locations.longitude]
       const sendata = this.markerIcon.join(',')
       const data = await this.$store.dispatch('yandex/pointSearchLotLang', sendata);
-      this.search = data.fullName
+      this.search = data.fullName;
+      this.locationNames(data)
     },
     locations() {
       window.navigator.geolocation.getCurrentPosition(this.showLocations)
@@ -117,10 +118,12 @@ export default {
       this.searchList = [];
     },
     closedMap() {
-      if (this.$route.path === '/') {
-        this.$bridge.$emit('vendor_fetch', {latitude: this.markerIcon[0], longitude: this.markerIcon[1]})
+      if (this.$route.path === '/' && this.markerIcon.length) {
+        this.$routePush({...this.$route.query,maps: undefined, lat:this.markerIcon[0], long: this.markerIcon[1]})
       }
-      this.$routePush({...this.$route.query, maps: undefined})
+      else {
+        this.$routePush({...this.$route.query, maps: undefined})
+      }
     },
     close () {
       this.searchList = []
