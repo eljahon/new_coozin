@@ -1,11 +1,11 @@
 
 <template>
-  <div v-if="$route.query.maps === 'maps'">
+  <div v-if="$route.query.orderMap === 'orderMap'">
     <div class="multiple-modal 1">
       <span class="flex flex-col mb-2">
         <div class="flex items-center justify-between mb-3">
           <h2>{{$t('delivery-address')}}</h2>
-          <span @click="$routePush({...$route.query,maps: undefined})">
+          <span @click="$routePush({...$route.query,orderMap: undefined})">
             <the-icon
               class="cursor-pointer"
               src="x"
@@ -46,14 +46,14 @@
             @click="closedMap"
             class="text-white p-2 px-4 rounded-2xl bg-orange-500"
           >
-            OK
+            {{$t('OK')}}
           </button>
         </div>
       </span>
       <yandex-maps v-if="isMapRender" @clickPlace="locationNames" :marker-icon="markerIcon"></yandex-maps>
     </div>
     <div class="modal-background 1"
-         @click="$routePush({...$route.query, maps: undefined})">
+         @click="$routePush({...$route.query, orderMap: undefined})">
     </div>
   </div>
 </template>
@@ -61,7 +61,6 @@
 <script>
 import yandexMaps from "@/components/yandex-maps/yandex-maps";
 import debounce from 'lodash.debounce'
-
 export default {
   name: "TheMaps",
   directives: {
@@ -73,6 +72,7 @@ export default {
       isMapRender: false,
       markerIcon: [41.30189519574488, 69.28935242760551],
       searchList: [],
+      selectPlaceName: null
     }
   },
   components: {
@@ -82,8 +82,9 @@ export default {
     async locationNames(selectPlaceNames) {
       this.markerIcon = [selectPlaceNames.getNames[0]?.latitude, selectPlaceNames.getNames[0]?.longitude]
       const {fullName} = selectPlaceNames;
-      this.search = fullName;
-      await this.$emit('changePlice', selectPlaceNames)
+      this.search = fullName
+      this.selectPlaceName = selectPlaceNames
+      // await this.$emit('changePlice', selectPlaceNames)
 
     },
     myLocations() {
@@ -117,14 +118,9 @@ export default {
       this.markerIcon = [item.location[1], item.location[0]];
       this.searchList = [];
     },
-    closedMap() {
-      console.log(this.$route.path)
-      if (this.$route.path === '/'||this.$route.path === '/uz/' && this.markerIcon.length) {
-        this.$routePush({...this.$route.query,maps: undefined, lat:this.markerIcon[0], long: this.markerIcon[1]})
-      }
-      else {
-        this.$routePush({...this.$route.query, maps: undefined})
-      }
+    async  closedMap() {
+       await this.$emit('changePlice', this.selectPlaceName)
+       this.$routePush({...this.$route.query, orderMap: undefined})
     },
     close () {
       this.searchList = []

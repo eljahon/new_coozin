@@ -6,31 +6,57 @@
       </nuxt-link>
       <the-icon src="right-arrow-black" />
       <span class="text-sm font-medium text-gray-500 cursor-pointer">{{$t('decor-order')}}</span>
+
     </div>
     <div class="container mx-auto flex gap-9 xl:px-0 xl:flex-nowrap	flex-wrap px-2">
+
       <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
-      <form novalidate class="bg-white w-full p-6 rounded-2xl" @submit.prevent="handleSubmit(orderCreate)">
+      <form novalidate class="bg-white w-full p-6 rounded-lg" @submit.prevent="handleSubmit(orderCreate)">
         <h1 class="font-semibold text-gray-800 text-2xl">{{$t('decor-order')}}</h1>
+        <div class="flex items-center pl-4 rounded dark:border-gray-700">
+          <input id="bordered-checkbox-1" type="checkbox" v-model="order_form.is_later" value="" name="bordered-checkbox" class="w-4 h-4 text-orange-500 bg-orange-500 rounded focus:ring-orange-500 dark:focus:ring-orange-500 dark:ring-offset-orange-500 focus:ring-2">
+          <label for="bordered-checkbox-1" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{$t('is-later')}}</label>
+        </div>
         <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
           <div>
             <ValidationProvider
               v-slot='{ errors }'
-              name='address'
+              name='user_adress'
               rules='required'
               mode='eager'
             >
+
               <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between">
-                <the-input
-                  styles="flex flex-col gap-3 input-styles"
-                  :label-styles="errors.length ? 'font-medium text-red-500' : 'font-medium text-gray-700' "
-                  :input-styles="errors.length ? 'sm:w-80 w-64 border-red-500 border-2' : 'sm:w-80 w-64'"
+              <div class="relative w-full">
+               <div class="flex w-full">
+                 <label for="address" :class="errors.length ? 'font-medium text-red-500' : 'font-medium text-gray-700'">{{ $t('delivery-place') }}</label>
+
+               </div>
+                <div class="relative mt-3">
+                <input
                   type="text"
-                  icon="location"
-                  name="address"
-                  :label="$t('delivery-place')"
+                  ref="inputaddress"
+                  name="user_adress"
+                  autocomplete="off"
+                  v-model="order_form.user_adress"
+                  :class="errors.length ? 'border-red-500 border-2' : ''"
+                  class="block pl-11 input-styles w-full px-4 py-2 text-gray-700 placeholder-gray-400 border text-gray-500 rounded-lg border-gray-200 pr-2 pl-11 text-base h-12 focus:outline-none focus:border-orange-600"
                   :placeholder="$t('matonat-street')+', 35'"
-                  :value="order.address"
+                  @focus="showOptions = true"
+                  :readonly="true"
+
+
                 />
+                <img class="absolute position"  :src="require(`~/assets/svg/location.svg`)" :alt="'location' + 'svg'" >
+
+              </div>
+                <div v-if="showOptions" class="absolute z-10 w-full mt-1 bg-white rounded-lg shadow-lg" >
+                  <ul class="h-[300px] overflow-y-scroll scroll-style" @mouseleave="haverMouseLeve">
+                    <li v-for="(item, index) in userAddress" class="px-4 py-2 cursor-pointer hover:bg-gray-100" :key="index" @click.stop="orderAddress(item)" >{{item.address}}</li>
+                  </ul>
+                </div>
+              </div>
+
                 <div class="map-card" @click="openMaps">
                   <the-icon src="map" />
                 </div>
@@ -48,14 +74,15 @@
 
                 <div class="relative">
                   <select
-                    class="bg-white w-full text-gray-500 border rounded-2xl border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
+                    class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
                     :class="{'border-red-500 border-2': errors.length, 'bg-gray-200': isAdders}"
                     id="dilevery-time"
                     name="dilevery-time"
-                    :disabled="isAdders"
+                    placeholder="'13:00 -14:00'"
                     style="-webkit-appearance: none;"
-                    v-model="order.delivery_time"
+                    v-model="order_form.delivery_time"
                   >
+                    <option value="13:00 -14:00" disabled selected hidden>13:00 -14:00</option>
                     <option v-for="(item, index) in timeList" :value="item" :key="index">{{item}}</option>
 
                   </select>
@@ -77,11 +104,11 @@
                <div class="flex gap-2">
                  <div class="relative w-full">
                    <select
-                     class="bg-white w-full text-gray-500 border rounded-2xl border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
+                     class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
                      id="payment_type"
                      :class="errors.length ? 'border-red-500 border-2' : ''"
                      name="payment_typee"
-                     v-model="order.card_id"
+                     v-model="order_form.card_id"
                      style="-webkit-appearance: none;"
                    >
                      <option v-for="(item, ind) in cardList" :key="ind" :value="item.value">{{item.label}}</option>
@@ -103,13 +130,13 @@
             <the-input
               styles="flex flex-col gap-3 w-full"
               label-styles="font-medium text-gray-700"
-              input-styles="sm:w-96 w-80 input-400"
+              input-styles="sm:w-96 w-80 input-400 rounded-lg"
               type="text"
               icon="office"
               name="address"
               :label="$t('reference-point')"
               :placeholder="$t('matonat-street')+', 35'"
-              :v-model="order.address_comment"
+              :v-model="order_form.comment"
             />
             <ValidationProvider
             v-slot='{ errors }'
@@ -121,12 +148,11 @@
               <label for="payment_type" :class="errors.length ? 'text-red-500' : ''" class="font-medium text-gray-700">{{$t('payment-method')}}</label>
               <div class="relative">
                 <select
-                  class="bg-white w-full text-gray-500 border rounded-2xl border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
+                  class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
                   id="payment_type"
                   :class="{'border-red-500 border-2': errors.length, 'bg-gray-200': isAdders}"
                   name="payment_typee"
-                  :disabled="isAdders"
-                  v-model="order.payment_type"
+                  v-model="order_form.payment_type"
                   style="-webkit-appearance: none;"
                 >
                   <option v-for="(item, ind) in paymentType" :key="ind" :value="item.value">{{$t(item.label)}}</option>
@@ -147,7 +173,7 @@
               <the-icon src="information-circle" width="20" height="20" />
             </div>
             <div class="container-switch">
-              <input type="checkbox" name="" id="switch">
+              <input v-model="choose" type="checkbox" name="" id="switch">
               <label for="switch">
                 <div class="switch">
                   <div class="bar"></div>
@@ -156,40 +182,34 @@
             </div>
           </div>
           <div class="max-w-sm overflow-x-scroll scroll-style">
-            <div class="sm:flex hidden items-center gap-3.5">
-              <div v-for="item in $store.state.days_list">
-                <menu-card
-                  :date="item"
-                  @onDates="setDateSelect"
-                />
-              </div>
-            </div>
-            <div class="sm:hidden flex items-center gap-3.5">
+            <div class=" sm:flex hidden items-center gap-3.5">
               <div v-for="item in $store.state.days_list">
                 <menu-card
                   :date="item"
                   :variant="true"
                   @onDates="setDateSelect"
                 />
-                <!--                {{$store.state.days_list}}-->
               </div>
             </div>
           </div>
         </div>
-        <div class="sm:w-96 w-full xl:m-0 mx-auto my-2">
+        <br>
+        <div class="sm:w-96 w-full items-end xl:m-0 mx-auto mt-5">
           <h3 class="text-lg font-semibold text-gray-700">{{$t('to-pay')}}</h3>
-          <div class="flex justify-between">
-            <h4 class="text-gray-600">{{$t('dishes')}}</h4>
-            <h4 class="font-medium text-gray-600">{{getCartItems.total_price}} {{$t('sum')}}</h4>
-          </div>
-          <div class="flex justify-between my-2">
-            <h4 class="text-gray-600">{{$t('delivery')}}</h4>
-            <h4 class="font-medium text-gray-600"> {{getCartItems?.delivery_price ? getCartItems.delivery_price : ' 10 000 +' }} {{$t('sum')}}</h4>
-          </div>
-          <div class="flex justify-between">
-            <h4 class="font-bold text-gray-600">{{$t('total')}}</h4>
-            <h4 v-if="getCartItems?.delivery_price !== null" class="font-bold text-gray-600">{{Number(getCartItems?.delivery_price)+Number(getCartItems.total_price) }} {{$t('sum')}}</h4>
-            <h4 v-else class="font-bold text-gray-600">{{Number(getCartItems.total_price)+10000 +"+" }} {{$t('sum')}}</h4>
+          <div class="rounded-lg p-3 total_summ -mx-0 mt-2">
+            <div class="flex justify-between">
+              <h4 class="text-gray-600">{{$t('dishes')}}</h4>
+              <h4 class="font-medium text-gray-600">{{getCartItems.total_price}} {{$t('sum')}}</h4>
+            </div>
+            <div class="flex justify-between my-2">
+              <h4 class="text-gray-600">{{$t('delivery')}}</h4>
+              <h4 class="font-medium text-gray-600"> {{del_price > 0 ? del_price : 10000+' +' }} {{$t('sum')}}</h4>
+            </div>
+            <div class="flex justify-between">
+              <h4 class="font-bold text-gray-600">{{$t('total')}}</h4>
+              <h4 v-if="getCartItems?.delivery_price !== null" class="font-bold text-gray-600">{{getCartItems.total_price+(del_price ? del_price : 1000) }} {{$t('sum')}}</h4>
+              <!--            <h4 v-else class="font-bold text-gray-600">{{Number(getCartItems.total_price)+10000 +"+" }} {{$t('sum')}}</h4>-->
+            </div>
           </div>
         </div>
         <button type="submit" class="w-full bg-gray-300 h-12 rounded-3xl text-gray-400 font-semibold mt-12 cursor-pointer">{{$t('pay')}}</button>
@@ -215,42 +235,42 @@
         </div>
       </div>
     </div>
-    <the-modal-maps @changePlice="changePlice"></the-modal-maps>
+    <order-yandex-maps @changePlice="changePlice"></order-yandex-maps>
     <cards-form-modal :fetach="getMyCard" />
   </div>
 </template>
 
 <script>
 import cardsFormModal from "@/components/card-modal/cards-form-modal";
+import orderYandexMaps from "@/components/yandex-maps/order-yandex-maps";
 import {mapGetters} from "vuex";
 export default {
   components: {
-    cardsFormModal
+    cardsFormModal,
+    orderYandexMaps,
   },
   data() {
     return {
-      paymentType: [
-        {value: 'cash', label: 'cash'},
-        {value: 'card', label:'card'},
-        {value: 'balance', label:'balance'},
-      ],
+      hover: false,
+      paymentType: [],
       isRendor: false,
       isAdders: true,
+      showOptions:false,
       timeList: [],
-      order: {
-        additional_name: this.$auth.state.user.full_name,
-        additional_phone: this.$auth.state.user.phone,
-        address: '',
-        address_comment: "",
-        comment: this.$route.query.comment_text ?? '',
-        delivery_time: null,
-        latitude: null,
-        longitude: null,
-        payment_type: "",
-        card_id: null,
-        user_address_id: null,
-        promocode: null,
-        voucher: null,
+      address_id:[],
+      userAddress: [],
+      choose: false,
+      del_price:0,
+      seeletLocation: {},
+      order_form: {
+        user: this?.$auth?.user?.id,
+        payment_type: 2,
+        user_adress: '',
+        is_later: false,
+        delivery_price: null,
+        delivery_time: this.$dayjs(new Date()).format('YYYY-MM-DD HH:mm'),
+        comment: this.$route.query.comment_text,
+        cart: this.$route.query.cart_id
       },
       cardList: [],
       isCardOpen: false
@@ -258,61 +278,85 @@ export default {
   },
   async fetch () {
     await this.getOrderItem()
+    await this.getMyPlace()
+    await this.getPaymentType()
     await this.getDate()
   },
- // async mounted() {
- //    if(this.$store?.state?.location?.longitude) {
- //      await this.orderTimeDelever()
- //    }
- //  },
   watch: {
-    'order.payment_type': function (val) {
-      if (val === 'card') {
+    'order_form.payment_type': function (val) {
+      if (val === 2) {
         this.isCardOpen = true;
         this.getMyCard()
+      } else {
+        this.isCardOpen = false
       }
+    },
+    'order_form.is_later': function (val) {
+      console.log(val)
     }
   },
   methods: {
    async changePlice(item) {
-     this.order.address = item.fullName;
-     this.order.latitude =item.getNames[0]?.latitude;
-     this.order.longitude = item.getNames[0]?.longitude;
-     await this.getOrderItem(item?.getNames[0]?.longitude,item?.getNames[0]?.latitude);
-     await this.orderTimeDelever()
+ const data =await this.getSelecPlaceFilters(item.fullName);
+     if (data.length===0) {
+       const {data:{data}} = await this.userAddresses(item);
+       this.order_form.user_adress = data.attributes.address;
+       this.order_form.comment = data.attributes.comment;
+       this.seeletLocation = data.attributes.location
+       this.address_id = [data.id];
+       await this.getDeliveryPrice()
+     }
      this.isAdders = false;
+    },
+   async orderAddress(item) {
+      this.order_form.user_adress = item.address;
+      this.seeletLocation = item.location;
+     this.address_id=[item.id]
+      this.showOptions = false;
+      await this.getDeliveryPrice()
+     this.$refs.inputaddress.blur()
+   },
+    async getDeliveryPrice() {
+     try {
+       const _params={
+         vendor: this.$route.query.vendor_id,
+         lat: Number(this.seeletLocation.lat),
+         long: Number(this.seeletLocation.long),
+       }
+       const {data} = await this.$axios.get('vendors/calc/delivery', {params:_params})
+       this.del_price = data.price;
+       return data
+
+     } catch (err) {
+       throw new Error(err)
+     }
     },
     addCardModalOpen () {
       this.$routePush({...this.$route.query, cardAdd: 'cardAdd'})
     },
     openMaps () {
-      this.$routePush({...this.$route.query,maps: 'maps'})
-      // this.$store.dispatch('yandex/mapModalOpen', true)
+      this.$routePush({...this.$route.query,orderMap: 'orderMap'})
     },
    async orderCreate () {
      try {
-       this.order['food'] = this.$store.state.cart?.cartItem?.items?.map(el => ({id: el.food.id, count: el.quantity}))
-       const data = await this.$axios.post('orders', {...this.order})
-       if (data.id) {
-             this.$router.push({path: this.localePath('/my-orders')})
-             this.$toast.success('new order create', {duration: 3000})
-       } else {
-         this.checkError(data)
+       const _order_form = {
+         ...this.order_form,
+         delivery_price:this.del_price,
+         user_adress: this.address_id[0],
+         cart: this.$route.query.cart_id
        }
-     } catch (err) {}
-    },
-    checkError(res) {
-      const {delivery_time, address, geolocation} = res.errors;
-      if (delivery_time) this.$toast.error(delivery_time[0], {duration: 4000})
-      if (address) this.$toast.error(address[0], {duration: 3000})
-      if (geolocation) this.$toast.error(geolocation[0], {duration: 3000})
+       const data  = await this.$axios.post('orders', {..._order_form})
+       console.log(data)
+       console.log('salom')
+     } catch (err) {
+       return  new Error(err)
+     }
     },
     async getDate () {
       return this.$store.dispatch('set_day')
     },
     setDateSelect (item) {
-      this.orderTimeDelever(item.day)
-      // this.order.delivery_time = item.date
+      console.log(item)
     },
    async getMyCard () {
       try {
@@ -329,37 +373,106 @@ export default {
         } catch (err) {}
         // const {objects} = await this.$axios.get('cards');
       } catch (err) {
-        console.log(err)
+        throw  new Error(err)
       }
    },
     async getOrderItem () {
       await this.$store.dispatch('cart/getCardItem',
-        {id:this.$route.query.order_id, locale: this.$i18n.locale})
+        {id:this.$route.query.cart_id, locale: this.$i18n.locale})
     },
-    lotLang(longitude,latitude) {
-    return   {id: this.$route.query.order_id,
-        longitude: longitude ?? this.$store?.state?.location?.longitude,
-        latitude: latitude ?? this.$store?.state?.location?.latitude}
+    async getPaymentType () {
+     try {
+       const {data: {results}} =  await this.$axios.get('payment-types', {params: {
+           populate: '*',
+           locale: this.$i18n.locale,
+           filters: {
+             id : {
+               $ne: 1
+             }
+           }
+         }})
+       this.paymentType = results.map((el) => {
+         return {
+           value: el.id,
+           label: el.name
+         }
+       })
+     } catch (err)
+     {
+       throw  new Error(err)
+     }
     },
-    async orderTimeDelever (date) {
-      let data = {
-        food: this.$store.state.cart?.cartItem?.items?.map(el => ({id: el.food.id, count: el.quantity})),
-        latitude: this.order.latitude,
-        longitude: this.order.longitude,
-        date_calc: date
-      }
-      const getData = await this.$store.dispatch('orderCarzina/order_deleveriy_time', {...data})
-      this.timeGenert(getData.preparation)
-      this.order.delivery_time = getData.preparation;
+    haverMouseLeve() {
+      this.showOptions = false;
+      this.$refs.inputaddress.blur()
     },
-   timeGenert (arr) {
-    this.timeList = [];
-      this.timeList.push(arr)
-      for (let i=0; i<5; i++) {
-         this.timeList.push(this.$dayjs(this.timeList[this.timeList.length-1]).add(10,'m').format('YYYY-MM-DD HH:mm:ss'))
-      };
-
+    async  getMyPlace () {
+    try {
+       const {data: {results}} =await this.$axios.get('user-adresses', {
+         params: {
+           populate: "*",
+           sort: [
+             'createdAt:desc'
+           ],
+           filters: {
+             user: {
+               id: {
+                 $eq: this.$auth.user.id
+               }
+             }
+           }
+         }
+       })
+      this.userAddress = results.map((el) => {
+        return {
+          address: el.address,
+          id: el.id,
+          location: el.location
+        }
+      })
+    }catch (err) {
+      throw new Error(err)
     }
+},
+    async getSelecPlaceFilters (address) {
+     try {
+       const {data: {results}} = await this.$axios.get('user-adresses',{params: {
+         populate: '*',
+           filters: {
+           address: address
+           }
+         }})
+       const data = results.map((el) => {
+         return {
+           address: el.address,
+           id: el.id,
+           location: el.location
+         }
+       })
+       return data
+     } catch (err) {
+       throw new Error(err)
+     }
+    },
+    async userAddresses (item) {
+      try {
+        const _user_address = {
+          address: item.fullName,
+          comment: item.getNames[0].name,
+          location: {
+            lat:item.getNames[0].latitude,
+            long: item.getNames[0].longitude
+          },
+          user: this.$auth.user.id
+
+        };
+        const data = await this.$axios.post('user-adresses', {data: _user_address})
+        await this.getMyPlace()
+        return await data
+      } catch (err) {
+        throw new Error(err)
+      }
+    },
   },
   computed: {
     ...mapGetters('cart', ['getCartItems'])
@@ -451,4 +564,8 @@ export default {
       width: 300px !important;
     }
   }
+  .total_summ {
+    border: 1px solid #E5E7EB;
+  }
+
 </style>

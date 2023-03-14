@@ -4,11 +4,6 @@
 export const i18n = {
   locales: [
     {
-      code: 'en',
-      name: 'Eng',
-      iso: 'en'
-    },
-    {
       code: 'ru',
       name: 'Рус',
       iso: 'ru'
@@ -23,7 +18,8 @@ export const i18n = {
   vueI18n: {
     fallbackLocale: "ru",
     messages: {
-      "uz": {}
+      "uz": {},
+      "ru": {}
     },
   },
 };

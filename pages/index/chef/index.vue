@@ -42,7 +42,7 @@
                 <img width="16" height="16" src="~/assets/svg/car.svg" alt="Car icon">
                 <span class="text-gray-800 md:text-xl sm:text-lg text-base">{{
                     itemVendor?.delever_price ? itemVendor.delever_price : '10000+'
-                  }}{{$t('sum')}}</span>
+                  }}{{ $t('sum') }}</span>
               </div>
             </div>
             <div
@@ -78,7 +78,7 @@
         <div class="switch-item delay-300"
              :class="{ 'switch-right': switchOn, 'switch-left': !switchOn }"></div>
         <div>
-          <span :class="{'text-orange-600': !switchOn, 'text-gray-500': switchOn}">{{$t('menu')}}</span>
+          <span :class="{'text-orange-600': !switchOn, 'text-gray-500': switchOn}">{{ $t('menu') }}</span>
         </div>
         <div>
           <span :class="{'text-orange-600': switchOn, 'text-gray-500': !switchOn}">Лента</span>
@@ -110,7 +110,7 @@
             />
           </div>
         </div>
-        <button :disabled="isPageCount" @click="pageCount"
+        <button v-if="pagination.pageSize < total" :disabled="isPageCount" @click="pageCount"
                 class="mx-auto mt-3 block py-2 bg-white rounded-lg text-center cursor-pointer sm:w-96 w-72"
                 :class="{'px-8 py-3bg-gray-300 text-white rounded focus:outline-none':isPageCount}"
         >
@@ -188,7 +188,7 @@ export default {
       isPageCount: false,
       pagination: {
         page: 1,
-        pageSize: 12,
+        pageSize: 8,
       },
       blogCard: [],
       itemVendor: {},
@@ -198,7 +198,7 @@ export default {
   },
   watch: {
     '$auth.loggedIn': function (val) {
-      if(val) this.$fetch()
+      if (val) this.$fetch()
     },
     '$route.query.category_id': function (val) {
       this.getFood()
@@ -273,40 +273,40 @@ export default {
       this.isFood = !this.isFood
     },
     async getFood() {
-    try {
-      this.loading = true
-      const _params = {...this.$route.query}
-      const {data: {results, pagination}} = await this.$axios.get('products', {
-        params: {
-          // limit: 10,
-          locale: this.$i18n.locale,
-          populate: '*',
-          pagination: this.pagination,
-          filters: {
-            vendor: {
-              id: {
-                $eq: _params.vendor_id
-              }
-            },
-            category:{
-              id: {
-                $eq: _params.category_id ?? undefined
+      try {
+        this.loading = true
+        const _params = {...this.$route.query}
+        const {data: {results, pagination}} = await this.$axios.get('products', {
+          params: {
+            // limit: 10,
+            locale: this.$i18n.locale,
+            populate: '*',
+            pagination: this.pagination,
+            filters: {
+              vendor: {
+                id: {
+                  $eq: _params.vendor_id
+                }
+              },
+              category: {
+                id: {
+                  $eq: _params.category_id ?? undefined
+                }
               }
             }
           }
+        });
+        if (results.length === 0) {
+          this.$toast.info(this.$t('food-is-not'))
         }
-      });
-      if(results.length === 0) {
-        this.$toast.info(this.$t('food-is-not'))
+        this.foods = results;
+        this.total = pagination.total;
+        this.loading = false;
+        return results;
+      } catch (err) {
+        this.loading = false;
+        throw new Error(err)
       }
-      this.foods = results;
-      this.total = pagination.total;
-      this.loading = false;
-      return results;
-    } catch(err){
-      this.loading = false;
-      throw new Error(err)
-    }
     },
     async getItem() {
       try {
@@ -320,7 +320,7 @@ export default {
         this.coor = [data.location.lat, data.location.long]
 
         await this.getFood()
-           return data
+        return data
       } catch (err) {
         throw new Error(err)
       }
@@ -330,7 +330,7 @@ export default {
     },
     async getCategories() {
       try {
-        const {data:{results}} = await this.$axios.get('categories', {
+        const {data: {results}} = await this.$axios.get('categories', {
           params: {
             populate: '*',
             locale: this.$i18n.locale
@@ -342,11 +342,11 @@ export default {
         throw new Error(err)
       }
     },
-     categoriesFilter(item) {
+    categoriesFilter(item) {
       if (item.category_id === 'all') {
         this.$routePush({...this.$route.query, category_id: undefined})
       } else {
-         this.$routePush({...this.$route.query, category_id: item.category_id});
+        this.$routePush({...this.$route.query, category_id: item.category_id});
       }
 
     },

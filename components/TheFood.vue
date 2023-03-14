@@ -32,13 +32,17 @@
           <div class="flex flex-col md:gap-2 gap-1 w-full modal-text">
             <h2 class="font-normal md:text-xl text-lg text-gray-800">{{ item.name }}</h2>
             <h4 class="md:text-xl text-lg font-semibold text-gray-700">{{ item.price }} {{$t('sum')}} <span class="font-normal">/порция</span></h4>
-            <div class="bg-orange-50 rounded-lg p-1.5 flex gap-2 items-center">
-              <the-icon src="orange-clock" />
-              <p class="text-orange-600 text-sm font-medium">Вам придётся подождать чуть дольше</p>
+            <div class="flex gap-1.5">
+              <div class="bg-orange-50 rounded-lg p-1.5 flex gap-2 items-center">
+                <p class="text-orange-600 text-sm font-medium">{{$t('amount')}}: {{item.amount ? item.amount : '0'}}</p>
+              </div>
+              <div class="bg-slate-100 rounded-lg p-1.5 flex gap-2 items-center">
+                <p class="text-black  text-sm font-medium">{{$t('minimum-order-quantity')}}:{{item.min_amount ? item.min_amount : '0'}}</p>
+              </div>
             </div>
-            <h2 class="font-semibold text-gray-700 mt-1">Описание</h2>
+            <h2 class="font-semibold text-gray-700 mt-1">{{$t('description')}}</h2>
             <p class="font-normal text-gray-700 text-sm">{{ item.description }}</p>
-            <h2 class="font-semibold text-gray-700 mt-1">Состав</h2>
+            <h2 class="font-semibold text-gray-700 mt-1">{{$t('composition')}}</h2>
             <div class="flex flex-wrap sm:gap-2 gap-1">
               <div v-for="data in item.ingredients" class="flex flex-wrap sm:gap-2 gap-1">
                 <div class="border-2 rounded-2xl px-2 pt-0 pb-1 border-gray-100" v-for="item in data.split(',')">
@@ -50,8 +54,7 @@
           <div class="flex lg:gap-16 sm:gap-4 justify-between">
             <div class="flex gap-6 items-center">
               <div @click.stop="increment"> <the-icon  class="cursor-pointer w-8" src="minus" /></div>
-
-              <span class="text-gray-700 font-semibold">{{count ? count: item.min_amount}}</span>
+              <span class="text-gray-700 font-semibold">{{count >=item.min_amount ? count : item.min_amount}}</span>
               <div @click.stop="decrement">
                 <the-icon  class="cursor-pointer w-8" src="plus" />
               </div>
@@ -63,6 +66,9 @@
               {{$t('Add-to-cart')}}
             </button>
           </div>
+        </div>
+        <div @click="isSee" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
+          <the-icon src="x" />
         </div>
       </div>
     </div>
@@ -88,30 +94,47 @@ export default {
 
   methods: {
   async  increment()
-    {if (this.count > 1) {
+    {if (this.count>this.item.min_amount) {
       this.count--;
-      }
+      } else {
+      this.$toast.error(`${this.$t('minimum-order-quantity')}: ${this.count}`)
+    }
     },
    async decrement(){
-     this.count = this.item.min_amount
-     this.count++;
+     if (this.count === this.item.amount) {
+       this.$toast.error(this.$t('all-now'))
+     } else {
+       if (this.count < this.item.min_amount) {
+         this.count = this.item.min_amount;
+         this.count++;
+       } else {
+         this.count++;
+       }
+     }
+
    },
    async addCazinaOrder () {
   try {
     if(this.$auth.loggedIn) {
-      const newItem = {
-        vendor: this.item.vendor.id,
-        user: this.$auth.user.id,
-        items: [
-          {
-            product: this.item.id,
-            count: parseInt(this.count) > parseInt(this.item.min_amount) ? this.count : this.item.min_amount
-          }
-        ]
+      if (this.item.amount > 0) {
+        const newItem = {
+          vendor: this.item.vendor.id,
+          user: this.$auth.user.id,
+          items: [
+            {
+              product: this.item.id,
+              count: parseInt(this.count) > parseInt(this.item.min_amount) ? this.count : this.item.min_amount
+            }
+          ]
+        }
+        const data = await this.$store.dispatch('cart/newOrderCreate',newItem)
+        this.isSee();
+
+      } else {
+        this.$toast.error(this.$t('amount-not'))
       }
       // await this.closeModal()
       //   .then(res => {
-         const data = await this.$store.dispatch('cart/newOrderCreate',newItem)
       if(data) {
         this.isSee()
         await this.$store.dispatch('cart/getCardList', {
@@ -124,12 +147,17 @@ export default {
       this.$toast.info(this.$t('you-are-login'))
     }
   } catch (err) {
-    throw new Error(err)
+    return  new Error(err)
   }
     },
     // async closeModal() {
     //  return  await this.$routePush({...this.$route.query, foodSaw: undefined})
     // }
+  },
+  computed: {
+    coutns (item) {
+      return this.count | item
+    }
   }
 }
 </script>

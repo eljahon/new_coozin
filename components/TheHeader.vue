@@ -142,7 +142,7 @@
 
     <!--  Order Modal  -->
     <the-modal />
-<!--    <the-modal-maps @changePlice="changePlace"/>-->
+    <the-modal-maps @changePlice="changePlace"/>
     <burger-menu />
   </div>
 </template>

@@ -5,7 +5,7 @@
     w-40 p-2 rounded-lg bg-gray-200 border
     active:border-orange-600 hover:border-orange-600
     hover:bg-white cursor-pointer"
-    :class="{ 'w-10 h-14': variant }"
+    :class="{ 'w-10 h-14': variant, 'pointer-events-none':false }"
   >
     <span
       class="font-semibold leading-5 text-xl text-gray-600 group-active:text-orange-600 group-hover:text-orange-600"

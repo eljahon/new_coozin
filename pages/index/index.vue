@@ -143,7 +143,7 @@
           <!--          <Loader :active="loading" />-->
           <div v-if="loading">
             <div class="main-styles py-4">
-              <div class="container mx-auto xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">
+              <div class="container mx-auto xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4" v-for="(item , index) in pagination.pageSize/4" :key="index">
                 <div role="status"
                      class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
                   <span class="sr-only">Loading...</span>
@@ -161,35 +161,6 @@
                   <span class="sr-only">Loading...</span>
                 </div>
               </div>
-              <div class="container mx-auto py-6 xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">
-                <div role="status"
-                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
-                  <span class="sr-only">Loading...</span>
-                </div>
-                <div role="status"
-                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
-                  <span class="sr-only">Loading...</span>
-                </div>
-                <div role="status"
-                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
-                  <span class="sr-only">Loading...</span>
-                </div>
-                <div role="status"
-                     class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">
-                  <span class="sr-only">Loading...</span>
-                </div>
-              </div>
-              <!--              <div class="container mx-auto xl:px-0 px-4 lg:flex hidden scroll-style overflow-x-scroll gap-4">-->
-              <!--                <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">-->
-              <!--                  <span class="sr-only">Loading...</span>-->
-              <!--                </div>-->
-              <!--                <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">-->
-              <!--                  <span class="sr-only">Loading...</span>-->
-              <!--                </div>-->
-              <!--                <div role="status" class="flex items-center justify-center h-56 w-96 bg-gray-300 rounded-lg animate-pulse dark:bg-gray-700">-->
-              <!--                  <span class="sr-only">Loading...</span>-->
-              <!--                </div>-->
-              <!--              </div>-->
             </div>
           </div>
           <VendorCard
@@ -327,7 +298,7 @@ export default {
             populate: "passport, patent, background, user, user.avatar, *",
             locale: this.$i18n.locale,
             pagination: this.pagination,
-            lot: this.$route.query.lat ?? undefined,
+            lat: this.$route.query.lat ?? undefined,
             long: this.$route.query.long ?? undefined,
             filters: {
               categories: {
@@ -368,7 +339,10 @@ export default {
       return this.$store.dispatch('set_day').then(res => this.pending = false)
     },
     categoriesFilter(item) {
-      // this.getVendors(item.category_id)
+     this.pagination = {
+       page: 1,
+       pageSize: 8
+     }
       if (item.category_id === 'all') {
         this.$routePush({...this.$route.query, category_id: undefined})
       } else {

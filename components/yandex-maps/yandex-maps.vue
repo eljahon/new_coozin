@@ -11,9 +11,10 @@
           :coords="markerIcon"
           :zoom="11"
           class="yandexMap"
+
           map-type="map"
           @click="Location"
-          :controls="['zoomControl', 'fullscreenControl', 'trafficControl', 'searchControl', 'smallMapDefaultSet']"
+          :controls="[]"
         >
           <ymap-marker
             :coords="markerIcon"

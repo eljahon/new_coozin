@@ -31,7 +31,7 @@ export const actions = {
           total_price: el.order_items.reduce((acc, el) => acc + el.price, 0),
           full_name: el.vendor.user.first_name + " " + el.vendor.user.last_name,
           cart_id: el.id,
-          cart_number: index + 1
+          cart_number: index + 1,
         }
       })
       commit('SET_CART_LIST', formatData)
@@ -44,13 +44,15 @@ export const actions = {
     try {
       const id = payload.id;
       delete payload.id;
-      const populate = 'order_items, vendor, vendor.user, vendor.user.avatar, order_items.product,order_items.product.media'
+      const populate = 'order_items, vendor, vendor.user, vendor.user.avatar,order_items.product,order_items.product.media'
       const {data} = await this.$axios.get(`carts/${id}`, {params: {populate, ...payload}})
+      console.log(data)
       const newdata = {
         id: data.id,
         vendor_img: data.vendor.user.avatar.aws_path,
         full_name: data.vendor.user.first_name + " " + data.vendor.user.last_name,
         total_price: data.order_items.reduce((acc, el) => acc + el.price, 0),
+        vendor_id: data.vendor.id,
         items: data?.order_items?.map((el, index) => {
           return {
             count: el.count,
@@ -58,7 +60,9 @@ export const actions = {
             id: el.id,
             image: el.product.media[0]?.aws_path,
             min_amount: el.product?.min_amount,
-            name: el.product.name
+            name: el.product.name,
+            vendor_id: data.vendor.id,
+            amount: el.product.amount
           }
         })
 
@@ -89,11 +93,7 @@ export const actions = {
   },
   async removeCartItem({commit, state}, payload) {
     try {
-      const update = JSON.stringify(state.cartItem);
-      const filterData = JSON.parse(update)
-      console.log(filterData, payload)
-      const order_items = filterData.items.filter(el => el.id !== payload)
-      const {data} = await this.$axios.put(`carts/${filterData.id}`, {data: {order_items}});
+      const {data} = await this.$axios.delete(`order-items/${payload}`);
       this.$toast.success('order item remove corzina ')
       // dispatch('getCardItem', {id:order_id, latitude,longitude})
       return data;
