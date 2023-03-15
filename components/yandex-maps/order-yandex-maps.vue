@@ -1,11 +1,11 @@
 
 <template>
-  <div v-if="$route.query.orderMap === 'orderMap'">
+  <div v-if="isMaps">
     <div class="multiple-modal 1">
       <span class="flex flex-col mb-2">
         <div class="flex items-center justify-between mb-3">
           <h2>{{$t('delivery-address')}}</h2>
-          <span @click="$routePush({...$route.query,orderMap: undefined})">
+          <span @click="setIsMaps">
             <the-icon
               class="cursor-pointer"
               src="x"
@@ -50,10 +50,10 @@
           </button>
         </div>
       </span>
-      <yandex-maps v-if="isMapRender" @clickPlace="locationNames" :marker-icon="markerIcon"></yandex-maps>
+      <yandex-maps @clickPlace="locationNames" :marker-icon="markerIcon"></yandex-maps>
     </div>
     <div class="modal-background 1"
-         @click="$routePush({...$route.query, orderMap: undefined})">
+         @click="setIsMaps">
     </div>
   </div>
 </template>
@@ -66,6 +66,7 @@ export default {
   directives: {
     debounce,
   },
+  props: ['isMaps', 'setIsMaps'],
   data() {
     return {
       search: '',
@@ -126,11 +127,6 @@ export default {
       this.searchList = []
     }
   },
-  mounted() {
-    setTimeout(() =>{
-      this.isMapRender = true
-    } ,0)
-  }
 }
 </script>
 <style scoped>

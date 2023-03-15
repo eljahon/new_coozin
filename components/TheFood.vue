@@ -93,10 +93,11 @@ export default {
   },
 
   methods: {
-  async  increment()
-    {if (this.count>this.item.min_amount) {
+  async  increment() {
+    if (this.count>this.item.min_amount) {
       this.count--;
-      } else {
+      }
+      else {
       this.$toast.error(`${this.$t('minimum-order-quantity')}: ${this.count}`)
     }
     },
@@ -131,6 +132,7 @@ export default {
         this.isSee();
 
       } else {
+        this.isSee();
         this.$toast.error(this.$t('amount-not'))
       }
       // await this.closeModal()
@@ -150,15 +152,7 @@ export default {
     return  new Error(err)
   }
     },
-    // async closeModal() {
-    //  return  await this.$routePush({...this.$route.query, foodSaw: undefined})
-    // }
   },
-  computed: {
-    coutns (item) {
-      return this.count | item
-    }
-  }
 }
 </script>
 

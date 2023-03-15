@@ -178,7 +178,7 @@
         </div>
       </div>
 
-      <button :disabled="isPageCount" @click="pageCount"
+      <button v-if="Number(pagination.pageSize) < Number(total)" :disabled="isPageCount" @click="pageCount"
               class="mx-auto mt-3 block py-2 bg-white rounded-lg text-center cursor-pointer sm:w-96 w-72"
               :class="{'px-8 py-3bg-gray-300 text-white rounded focus:outline-none':isPageCount}"
       >
@@ -221,6 +221,15 @@ export default {
   auth: false,
   data() {
     return {
+      weekdays: {
+        '0': 7,
+        '1': 1,
+        '2': 2,
+        '3': 3,
+        '4': 4,
+        '5': 5,
+        '6': 6
+      },
       location: false,
       more: false,
       pending: false,
@@ -236,7 +245,7 @@ export default {
       collections: [],
       renderCount: 0,
       limit: 8,
-      total: 0,
+      total: 8,
       pagination: {
         page: 1,
         pageSize: 8
@@ -295,7 +304,7 @@ export default {
         this.loading = true
         const {data: {results, pagination}} = await this.$axios.get('vendors/all', {
           params: {
-            populate: "passport, patent, background, user, user.avatar, *",
+            populate: "passport, patent, background, user, user.avatar, working_days, *",
             locale: this.$i18n.locale,
             pagination: this.pagination,
             lat: this.$route.query.lat ?? undefined,
@@ -307,6 +316,7 @@ export default {
                 }
               },
               verified: {$eq: true},
+              working_days: (this.weekdays[this.$dayjs(new Date()).day()])
             }
           }
         });
@@ -371,6 +381,7 @@ export default {
     ...mapGetters(['get_days_list']),
   },
   mounted() {
+    // console.log(this.$dayjs(new Date()).day())
     this.location = true;
     this.$bridge.$on('vendor_fetch', async (message) => {
       this.locations = message;

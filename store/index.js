@@ -1,5 +1,4 @@
 export const state = () => ({
-  userList: [],
   currentUser: {},
   login: false,
   register: false,
@@ -23,68 +22,52 @@ export const state = () => ({
   locatinsName: null,
 });
 export const mutations = {
-  SET_USER: (state, payload) => {
-    state.userList = payload;
-  },
   SET_DAY: (state, payload) => {
     state.days_list = payload
   },
-  SET_CURRENT_USER: (state, payload) => {
-    state.currentUser = payload
-  },
-  LOGIN_MODAL: (state, payload) => {
-    state.login = payload
-  },
-  REGISTER_MODAL: (state, payload) => {
-    state.register = payload
-  },
-  FOOD_MODAL: (state, payload) => {
-    state.food = payload
-  },
+  // FOOD_MODAL: (state, payload) => {
+  //   state.food = payload
+  // },
   SET_LOCATION_NAME: (state, paylaod) => {
     state.locatinsName = paylaod;
   },
-   fSET_LOCATION: (state, payload) => {
-    state.location = payload
-  },
+  //  fSET_LOCATION: (state, payload) => {
+  //   state.location = payload
+  // },
   BURGER_OPEN: (state, payload) => {
     state.burger = payload
   },
 };
 export const actions = {
-  set_user_list({ commit }, payload) {
-    commit("SET_USER", payload);
-  },
   set_day({commit,state}, payload) {
     let days = [];
+    let weekDay={
+      '0': 'sunday',
+      '1': 'monday',
+      '2': 'tuesday',
+      '3': 'wednesday',
+      '4': 'thursaday',
+      '5': 'friday',
+      '6': 'satuday'
+    }
     for (let i=0; i<7; i++) {
     days.push({
       date: this.$dayjs(new Date ()).add(i, 'day').format('YYYY-MM-DD d'),
       seeDate: this.$dayjs(new Date ()).add(i, 'day').format('DD'),
       name: state.monthNames[this.$dayjs(new Date ()).add(i, 'day').format('YYYY-MM-DD').split('-')[1]],
-     weekday: Number(this.$dayjs(new Date ()).add(i, 'day').format('d'))+1
+     weekday: weekDay[Number(this.$dayjs(new Date ()).add(i, 'day').format('d'))]
     })
     };
     commit('SET_DAY', days)
   },
-  // async setUser ({commit}, res) {
-  //   try {
-  //     this.$auth.setUserToken(res.jwt)
-  //     // const info = await this.$axios.get('/users/me')
-  //     // this.$auth.setUser(info)
-  //     // this.$cookies.set('userInfo', info)
-  //     // return info;
-  //     console.log(this.$auth)
-  //   } catch (err) {
-  //   }
-  // },
-  // async Login ({commit, dispatch}, payload) {
-  //  return await dispatch('setUser', payload)
-  // },
-  set_location ({commit}, payload) {
-    commit('SET_LOCATION', payload)
-    this.$cookies.set('langlot', payload)
+  async setVendorWeekday ({commit,state}, res) {
+    const dayList = JSON.parse(JSON.stringify(state.days_list))
+    console.log(state.dayList)
   },
+  // set_location ({commit}, payload) {
+  //   commit('SET_LOCATION', payload)
+  //   this.$cookies.set('langlot', payload)
+  // },
 
   // async nuxtServerInit({ commit }) {
   //   // const userInfo = this.$cookies.get('userInfo')
@@ -104,9 +87,6 @@ export const actions = {
   },
   registerModal ({ commit }, payload) {
     commit('REGISTER_MODAL', payload)
-  },
-  foodModal ({ commit }, payload) {
-    commit('FOOD_MODAL', payload)
   },
   burgerOpen({ commit }, payload) {
     commit('BURGER_OPEN', payload)

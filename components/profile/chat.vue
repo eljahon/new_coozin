@@ -76,8 +76,13 @@ export default {
     await this.socket.on('joined', message => console.log(message));
     await this.getOperator()
     await this.getRooms()
-    await this.getMessages()
     await this.chatToBottom()
+  },
+  watch: {
+    '$route.query.room_id': function (val) {
+      // console.log(val)
+      this.getMessages()
+    }
   },
   methods: {
     async getRooms() {
@@ -244,9 +249,9 @@ export default {
       }
     },
     chatToBottom() {
-      this.$nextTick(() => {
-        this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
-      })
+      // this.$nextTick(() => {
+      //   this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
+      // })
     },
     async getOperator() {
       try {

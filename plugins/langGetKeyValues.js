@@ -22,6 +22,7 @@ export default function ({app, $axios, i18n},inject) {
       i18n.mergeLocaleMessage( locale?.keyword ??i18n.locale, {...results.reduce((obj, item) => Object.assign(obj, { [item.key]: item.value }), {})})
       i18n.setLocale(locale?.keyword)
       i18n.defaultLocale = locale?.keyword ?? i18n.locale;
+      console.log(i18n,'i18n')
      await app.router.push(app.switchLocalePath(locale?.keyword ?? i18n.locale))
     } catch (err) {
          throw new Error(err)

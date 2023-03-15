@@ -13,12 +13,19 @@
       <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
       <form novalidate class="bg-white w-full p-6 rounded-lg" @submit.prevent="handleSubmit(orderCreate)">
         <h1 class="font-semibold text-gray-800 text-2xl">{{$t('decor-order')}}</h1>
-        <div class="flex items-center pl-4 rounded dark:border-gray-700">
-          <input id="bordered-checkbox-1" type="checkbox" v-model="order_form.is_later" value="" name="bordered-checkbox" class="w-4 h-4 text-orange-500 bg-orange-500 rounded focus:ring-orange-500 dark:focus:ring-orange-500 dark:ring-offset-orange-500 focus:ring-2">
-          <label for="bordered-checkbox-1" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">{{$t('is-later')}}</label>
-        </div>
+
+
         <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
           <div>
+            <!--        is_later-->
+            <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between">
+              <div class="relative w-full">
+                <div class="flex items-center pl-4 rounded dark:border-gray-700">
+                  <input id="bordered-checkbox-1" type="checkbox" v-model="order_form.is_later" value="" name="bordered-checkbox" class="w-4 h-4 text-orange-500 bg-orange-500 rounded focus:ring-blue-500 dark:focus:ring-blue-500 dark:ring-offset-orange-500 focus:ring-2">
+                  <label for="bordered-checkbox-1" class="w-2/12 py-4 ml-2 font-medium text-gray-900 dark:text-gray-300">{{$t('is-later')}}</label>
+                </div>
+              </div>
+            </div>
             <ValidationProvider
               v-slot='{ errors }'
               name='user_adress'
@@ -30,7 +37,6 @@
               <div class="relative w-full">
                <div class="flex w-full">
                  <label for="address" :class="errors.length ? 'font-medium text-red-500' : 'font-medium text-gray-700'">{{ $t('delivery-place') }}</label>
-
                </div>
                 <div class="relative mt-3">
                 <input
@@ -127,6 +133,14 @@
 
           </div>
           <div>
+            <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between">
+              <div class="relative w-full">
+                <div class="flex items-center pl-4 rounded dark:border-gray-700">
+<!--                  <input id="bordered-checkbox-1" type="checkbox" v-model="order_form.is_later" value="" name="bordered-checkbox" class="w-4 h-4 text-orange-500 bg-orange-500 rounded focus:ring-blue-500 dark:focus:ring-blue-500 dark:ring-offset-orange-500 focus:ring-2">-->
+                  <label for="bordered-checkbox-1" class="w-full py-4 ml-2 text-sm font-medium text-gray-900 opacity-0 dark:text-gray-300">{{$t('is-later')}}</label>
+                </div>
+              </div>
+            </div>
             <the-input
               styles="flex flex-col gap-3 w-full"
               label-styles="font-medium text-gray-700"
@@ -235,7 +249,7 @@
         </div>
       </div>
     </div>
-    <order-yandex-maps @changePlice="changePlice"></order-yandex-maps>
+    <order-yandex-maps :is-maps="isMaps" :set-is-maps="setIsMaps" @changePlice="changePlice"></order-yandex-maps>
     <cards-form-modal :fetach="getMyCard" />
   </div>
 </template>
@@ -252,11 +266,13 @@ export default {
   data() {
     return {
       hover: false,
+      isMaps: false,
       paymentType: [],
       isRendor: false,
       isAdders: true,
       showOptions:false,
       timeList: [],
+      vendor: null,
       address_id:[],
       userAddress: [],
       choose: false,
@@ -280,6 +296,7 @@ export default {
     await this.getOrderItem()
     await this.getMyPlace()
     await this.getPaymentType()
+    await this.getItemVendor()
     await this.getDate()
   },
   watch: {
@@ -296,6 +313,26 @@ export default {
     }
   },
   methods: {
+    async getItemVendor() {
+      try {
+        const {data} = await this.$axios.get(`vendors/${this.$route.query.vendor_id}`, {
+          params: {
+            populate: "*",
+            filters: {
+              id: {
+                $eq: this.$route.query.vendor_id
+              }
+            }
+          }
+        })
+        console.log(data)
+      } catch (err) {
+        return new Error(err)
+      }
+    },
+    setIsMaps () {
+      this.isMaps=!this.isMaps
+    },
    async changePlice(item) {
  const data =await this.getSelecPlaceFilters(item.fullName);
      if (data.length===0) {
