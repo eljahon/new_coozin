@@ -36,6 +36,7 @@ export default {
   },
   methods: {
     onSubmit() {
+      console.log(this.otp)
       this.$emit('handelOtp', this.otp)
     }
   }
@@ -43,5 +44,4 @@ export default {
 </script>
 
 <style scoped>
-
 </style>

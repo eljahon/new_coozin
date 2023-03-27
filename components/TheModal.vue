@@ -64,7 +64,7 @@
         </div>
       </div>
       <div v-if="getCartItems?.items?.length">
-        <div class="mt-4 flex flex-col gap-4" v-for="(item, index) in getCartItems.items">
+        <div class="mt-4 flex flex-col gap-4" v-for="(item, index) in getCartItems.items" :key="index">
           <div class="flex gap-5">
             <div class="w-24 h-24 rounded-lg overflow-hidden flex shrink-0">
               <img class="w-full object-cover" :src="$img+item.image" alt="Food Photo">

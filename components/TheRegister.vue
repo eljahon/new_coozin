@@ -1,14 +1,19 @@
 <template>
   <div v-if="$route.query.register">
     <div class="register-modal">
-      <div @click="$router.push({path: localePath($route.path), query: {...$route.query,login: undefined, register: undefined}})" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
+      <div @click="close" class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center relative x-position cursor-pointer">
         <the-icon src="x" />
       </div>
-      <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('login-account') }}</h2>
+      <h2 class="text-2xl font-bold text-center text-gray-700">{{ $t('registration') }}</h2>
       <p class="text-lg text-center text-gray-700 mt-1">{{ $t('have-account') }}
-        <span @click="$router.push({path: localePath($route.path), query: {...$route.query,login: 'login', register: undefined}})" class="text-orange-600 cursor-pointer font-semibold">{{ $t('login') }}</span>
+        <span 
+          @click="$router.push({path: localePath($route.path), query: {...$route.query,login: 'login', register: undefined}})" 
+          class="text-orange-600 cursor-pointer font-semibold"
+        >
+          {{ $t('login-account') }}
+        </span>
       </p>
-        <div v-if="$route.query.register == 'register'" class="flex flex-col">
+        <div v-if="isRegister" class="flex flex-col">
           <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
           <form novalidate class="sm:w-96 w-full" @submit.prevent="handleSubmit(funcRegister)">
             <ValidationProvider
@@ -54,25 +59,34 @@
             <input
               class="bg-white text-gray-500 border rounded-2xl border-gray-200
                py-2.5 px-4 text-base h-12 outline-orange-600 sm:w-96 w-full bg-gray-100 mb-4"
-              v-model="register.phone"
+              v-model.trim="phone"
               type="text"
+              @input="checkPhone"
               :class="errors.length > 0? 'border-red-400' :''"
-              placeholder="Введите номер телефона +998XX XXX XX XX"
+              :placeholder="$t('enter-phone-or-email')"
             >
             </ValidationProvider>
-            <button class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold" type="submit">{{ $t('continue') }}</button>
+            <button 
+              class="sm:w-96 w-full h-14 rounded-3xl bg-orange-600 text-white font-semibold"
+              :class="disable ? 'opacity-70' : ''"
+              type="submit"
+              :disabled="disable"
+            >
+              {{ $t('continue') }}
+            </button>
           </form>
           </ValidationObserver>
         </div>
-        <register-confirm :phone="register.phone"></register-confirm>
+        <div v-else>
+          <register-confirm :data="register" @confirm="confirm"></register-confirm>
+        </div>
     </div>
-    <div @click="$router.push({path: localePath($route.path), query: {...$route.query, register: undefined}})" class="register-background"></div>
+    <div @click="close" class="register-background"></div>
   </div>
 </template>
 
 <script>
 import registerConfirm from './register/register-confirm.vue'
-
 export default {
   props: ['hide'],
   components: {
@@ -84,23 +98,47 @@ export default {
         first_name: '',
         last_name: '',
         phone: ''
-      }
+      },
+      phone: '',
+      disabled: false,
+      isRegister: true
+    }
+  },
+  computed: {
+    disable() {
+      return !this.register.first_name || !this.register.last_name || !this.register.phone || this.disabled
     }
   },
   methods: {
+    close() {
+      this.$router.push({path: this.localePath(this.$route.path), query: {...this.$route.query, register: undefined}})
+      this.isRegister = true
+      this.register = {}
+      this.phone = ''
+    },
+    checkPhone(e) {
+      let el = e.target.value.trim()
+      if (el.length > 0 && el[0] !== '+') {
+        this.phone = '+998' + this.phone
+      }
+      this.register.phone = this.phone
+    },
     async funcRegister() {
+      this.disabled = true
        try {
-         let data = await this.$axios.post('/users-permissions/register_otp', this.register);
-         if (data.status) {
-           this.$routePush({...this.$route.query, register: 'otp'})
-           this.$toast.success('You are success register')
-         }
+          await this.$axios.post('/users-permissions/register_otp', this.register);
+          this.isRegister = false
+          await this.$toast.success('You are success register')
        } catch (err) {
+        setTimeout(() => {
+          this.disabled = false
+        }, 2000)
        }
       },
-    toLogin() {
-      this.$store.dispatch('registerModal', false)
-      this.$store.dispatch('loginModal', true)
+    confirm() {
+      this.isRegister = true
+      this.register = {}
+      this.phone = ''
     }
   },
 }
@@ -122,7 +160,6 @@ export default {
   top: 14px;
   right: 14px;
 }
-
 .register-modal {
   position: fixed;
   z-index: 3;

@@ -4,12 +4,12 @@
       <div class="flex md:flex-nowrap flex-wrap  md:p-4 p-3 rounded-t-2xl overflow-hidden md:gap-5 gap-3 food-modal__item">
         <div class="flex flex-col md:gap-3 gap-2">
           <div class="img">
-            <img v-if="item?.media[0]?.aws_path" class="w-full h-full object-cover" :src="$img+item.media[0].aws_path"  alt="Phone">
+            <img v-if="item?.media[0]?.aws_path" class="w-full h-full object-cover" :src="$img+item.media[0]?.aws_path"  alt="Phone">
             <img v-else class="w-full h-full object-cover" src="@/assets/img/img-1.jpg" alt="Phone">
           </div>
           <div class="flex items-center gap-3">
             <div class="avatar">
-              <img v-if="user?.user?.avatar?.aws_path" class="w-full object-cover" :src="$img+user.user.avatar.aws_path" alt="Avatar">
+              <img v-if="user?.user?.avatar?.aws_path" class="w-full object-cover" :src="$img+user.user.avatar?.aws_path" alt="Avatar">
               <img v-else class="w-full object-cover" :src="img" alt="Avatar">
             </div>
             <div class="flex flex-col gap-2">
@@ -44,11 +44,11 @@
             <p class="font-normal text-gray-700 text-sm">{{ item.description }}</p>
             <h2 class="font-semibold text-gray-700 mt-1">{{$t('composition')}}</h2>
             <div class="flex flex-wrap sm:gap-2 gap-1">
-              <div v-for="data in item.ingredients" class="flex flex-wrap sm:gap-2 gap-1">
+              <!-- <div v-for="data in item.ingredients" class="flex flex-wrap sm:gap-2 gap-1">
                 <div class="border-2 rounded-2xl px-2 pt-0 pb-1 border-gray-100" v-for="item in data.split(',')">
                   <span class="text-xs text-gray-600">{{ item }}</span>
                 </div>
-              </div>
+              </div> -->
             </div>
           </div>
           <div class="flex lg:gap-16 sm:gap-4 justify-between">

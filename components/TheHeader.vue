@@ -138,7 +138,7 @@
     <the-login/>
 
     <!--  Register  -->
-    <the-register :hide="$store.state.register"/>
+    <the-register/>
 
     <!--  Order Modal  -->
     <the-modal />
@@ -247,7 +247,7 @@ export default {
           populate: 'vendor, vendor.user, order_items',
         locale: this.$i18n.locale
         })
-        if (item.length) {
+        if (item.length && !this.$route.query.foodSaw) {
           this.$routePush({
             ...this.$route.query,
             foodSaw: "multipleOrder",

@@ -3,7 +3,7 @@ export const state = () => ({
   login: false,
   register: false,
   burger: false,
-  food: false,
+  food: false, 
   monthNames: {
     "01": 'Yan',
     "02": 'Fer',
@@ -63,6 +63,17 @@ export const actions = {
   async setVendorWeekday ({commit,state}, res) {
     const dayList = JSON.parse(JSON.stringify(state.days_list))
     console.log(state.dayList)
+  },
+  async setUser ({commit}, res) {
+    try {
+      this.$auth.setUserToken(res.jwt)
+      const info = await this.$axios.get('/users/me')
+      this.$auth.setUser(info)
+      this.$cookies.set('userInfo', info)
+      return info;
+      console.log(this.$auth)
+    } catch (err) {
+    }
   },
   // set_location ({commit}, payload) {
   //   commit('SET_LOCATION', payload)

@@ -2,7 +2,7 @@
   <div class="login">
     <div class="p-6 bg-white rounded-2xl flex items-center justify-center w-full h-full">
       <div class="rounded-full bg-gray-50 xl:w-96 w-60 h-60 xl:h-96 flex items-center justify-center flex-col">
-        <div v-if="user.avatar.aws_path" class="xl:w-36 w-28 rounded-full overflow-hidden border-4 border-gray-300 mb-5">
+        <div v-if="user.avatar?.aws_path" class="xl:w-36 w-28 rounded-full overflow-hidden border-4 border-gray-300 mb-5">
           <img class="w-full fit-cover" :src="$img+user.avatar.aws_path" alt="Avatar image">
         </div>
         <div v-else class="xl:w-36 w-28 rounded-full overflow-hidden border-4 border-gray-300 mb-5">

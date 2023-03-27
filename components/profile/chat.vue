@@ -5,7 +5,7 @@
       <h4 class="text-center text-sm text-gray-600">Октябрь 16</h4>
       <div class="flex flex-col justify-between h-96 py-4">
         <div class="flex flex-col justify-between h-full">
-          <div
+          <div 
             class="flex flex-col justify-between py-4 overflow-y-scroll pr-5 pb-10"
             ref="chat"
           >

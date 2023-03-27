@@ -48,49 +48,73 @@
       </div>
     </div>
     <div v-else class="main-styles pb-8">
-      <!--  Banner  -->
-      <div class="container mx-auto py-8 xl:px-0 px-4 lg:block hidden">
-        <div class="lg:flex lg:justify-center lg:gap-4">
+
+      <!-- Banner -->
+      <div class="container mx-auto xl:grid grid-cols-4 gap-2 py-8 hidden">
+        <div class="rounded-2xl overflow-hidden h-80">
           <banner-card
-            :src="collections[0]?.banner?.url"
-            add-style="card-1"
+            src="https://picsum.photos/300/400"
+            add-style="w-full h-full"
             :status="collections[0]?.name"
-            status-style="text-cyan-600 bg-teal-50"
+            status-style="text-green-600 bg-green-50"
           />
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-4">
+        </div>
+        <div class="rounded-2xl overflow-hidden h-80 flex flex-col gap-2">
+          <div class="grid grid-cols-2 w-full gap-2">
+            <div class="rounded-2xl overflow-hidden h-44">
               <banner-card
-                :src="collections[1]?.banner?.url"
-                add-style="card-2"
+                src="https://picsum.photos/200/200"
+                add-style="w-full h-full"
                 :status="collections[1]?.name"
-                status-style="text-red-600 bg-red-50"
-              />
-              <banner-card
-                :src="collections[2]?.banner?.url"
-                add-style="card-3"
-                :status="collections[2]?.name"
-                status-style="text-orange-600 bg-orange-50"
+                status-style="text-green-600 bg-green-50"
               />
             </div>
-            <div class="flex items-center gap-4">
+            <div class="rounded-2xl overflow-hidden h-44">
               <banner-card
-                :src="collections[3]?.banner?.url"
-                add-style="card-4"
-                :status="collections[3]?.name"
-                status-style="text-purple-600 bg-purple-50"
-              />
-              <banner-card
-                :src="collections[4]?.banner?.url"
-                add-style="card-5"
-                :status="collections[4]?.name"
+                src="https://picsum.photos/201/200"
+                add-style="w-full h-full"
+                :status="collections[1]?.name"
                 status-style="text-green-600 bg-green-50"
               />
             </div>
           </div>
+          <div class="grid grid-cols-1">
+            <banner-card
+              src="https://picsum.photos/301/201"
+              add-style="w-full h-full"
+              :status="collections[0]?.name"
+              status-style="text-green-600 bg-green-50"
+            />
+          </div>
+        </div>
+        <div class="rounded-2xl overflow-hidden h-80">
+          <banner-card
+            src="https://picsum.photos/302/402"
+            add-style="w-full h-full"
+            :status="collections[0]?.name"
+            status-style="text-green-600 bg-green-50"
+          />
+        </div>
+        <div class="rounded-2xl overflow-hidden h-80 flex flex-col gap-2">
+          <div class="grid grid-cols-1">
+            <banner-card
+              src="https://picsum.photos/302/203"
+              add-style="w-full h-44"
+              :status="collections[0]?.name"
+              status-style="text-green-600 bg-green-50"
+            />
+          </div>
+          <div class="grid grid-cols-1">
+            <banner-card
+              src="https://picsum.photos/301/201"
+              add-style="w-full h-full"
+              :status="collections[0]?.name"
+              status-style="text-green-600 bg-green-50"
+            />
+          </div>
         </div>
       </div>
-
-      <div class="lg:hidden container mx-auto overflow-x-scroll sm:py-6 py-2 xl:px-0 sm:px-4 px-2 scroll-style">
+      <div class="xl:hidden container mx-auto overflow-x-scroll sm:py-6 py-2 xl:px-0 sm:px-4 px-2 scroll-style">
         <div class="flex items-center sm:gap-4 gap-2 w-full">
           <banner-card
             v-for="item in collections"
@@ -102,6 +126,7 @@
           />
         </div>
       </div>
+      <!-- Banner end -->
 
       <!--  Menu section  -->
       <div class="container mx-auto xl:px-0 sm:px-4 px-2 sm:py-8 py-4">

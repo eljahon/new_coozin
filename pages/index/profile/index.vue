@@ -84,11 +84,11 @@ export default {
       ],
     }
   },
-computed:{
+  computed:{
     user () {
       return this.$auth.user
     }
-},
+  },
   methods: {
     handleRoute(item) {
       if (item.link) {
@@ -113,7 +113,7 @@ computed:{
 </script>
 
 <style scoped>
-  .main-styles {
-    background: #F3F4F6;
-  }
+.main-styles {
+  background: #F3F4F6;
+}
 </style>
