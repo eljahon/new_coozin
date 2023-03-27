@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nuxt --dotenv --port 3000",
-    "prod":"nuxt --dotenv .env.production",
+    "prod": "nuxt --dotenv .env.production",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate"
@@ -15,10 +15,11 @@
     "@nuxtjs/dayjs": "^1.4.1",
     "@nuxtjs/i18n": "^7.3.0",
     "@nuxtjs/toast": "^3.3.0",
-    "vee-validate": "^3.4.5",
     "cookie-universal-nuxt": "^2.2.2",
     "core-js": "^3.25.3",
     "nuxt": "^2.15.8",
+    "socket.io-client": "^4.6.1",
+    "vee-validate": "^3.4.5",
     "vue": "^2.7.10",
     "vue-yandex-maps": "^0.11.13"
   },
