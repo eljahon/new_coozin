@@ -10,7 +10,7 @@
     </div>
     <div class="container mx-auto flex gap-9 xl:px-0 xl:flex-nowrap	flex-wrap px-2">
 
-      <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
+      <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }" slim>
         <form novalidate class="bg-white w-full p-6 rounded-lg" @submit.prevent="handleSubmit(orderCreate)">
           <h1 class="font-semibold text-gray-800 text-2xl">{{ $t('decor-order') }}</h1>
           <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
@@ -88,13 +88,14 @@
                   <label for="payment_type" :class="errors.length ? 'text-red-500' : ''"
                          class="font-medium text-gray-700">{{ $t('payment-method') }}</label>
                   <thedropdwon
-                    @@custom-click="onChildClick"
                     id="payment_type"
                     name="payment_type"
+                    selected
                     :placeholder="$t('payment_type')"
                     v-model="order_form.payment_type"
                     :errors="errors.length!==0 ? true : false"
-                    :options="paymentType"></thedropdwon>
+                    :options="paymentType">
+                  </thedropdwon>
 <!--                  <div class="relative">-->
 <!--                    <select-->
 <!--                      class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"-->
@@ -193,6 +194,7 @@
                   <thedropdwon
                     id="delivery_time"
                     name="delivery_time"
+                    selected
                     :placeholder="'13:00 -14:00'"
                     v-model="order_form.delivery_time"
                     :errors="errors.length!==0 ? true : false"
@@ -375,7 +377,7 @@ export default {
     },
     onChildClick(event) {
       console.log('Child clicked');
-      event.stopPropagation();
+      // event.stopPropagation();
     },
     selectOption(item) {
       this.selectedOption = item;
