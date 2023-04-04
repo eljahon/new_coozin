@@ -53,14 +53,13 @@
           {{ $t('your-order-vendor') }}
           <br>
 
-          <span v-if="getCartItems && getCartItems.full_name"
-                class="text-orange-600">{{ getCartItems.full_name }}</span>
+          <span v-if="getCartItems && getCartItems.full_name" class="text-orange-600">{{ getCartItems.full_name }}</span>
           <span v-else class="text-orange-600">{{ $t('not-vendor_name') }}</span>
         </h4>
         <div class="w-14 h-14 flex-shrink flex rounded-full overflow-hidden border-2 border-orange-100">
           <img v-if="getVendors?.vendor_img" class="w-full object-cover" :src="$img+getVendors.vendor_img"
                alt="Avatar Chef">
-          <img class="w-full object-cover" src="../assets/img/vendor.png" alt="Avatar Chef">
+          <img v-else class="w-full object-cover" src="../assets/img/vendor.png" alt="Avatar Chef">
         </div>
       </div>
       <div v-if="getCartItems?.items?.length">
@@ -165,8 +164,11 @@
 
 <script>
 import {mapGetters} from "vuex";
-
+import debounce from 'lodash.debounce'
 export default {
+  directives: {
+    debounce,
+  },
   data() {
     return {
       comment: false,
@@ -203,13 +205,11 @@ export default {
     formatPrice(item) {
       const data = item?.delivery_price ?
         item?.total_price + item?.delivery_price :
-        item?.total_price + 10000 + '+';
+        item?.total_price + 9000 + '+';
       return data
     },
     async getCartList() {
-      return await this.$store.dispatch('cart/getCardList', {
-        populate: 'vendor, vendor.user, order_items'
-      })
+      return await this.$store.dispatch('cart/getCardList')
     },
     async getCartItem() {
       return
@@ -257,20 +257,33 @@ export default {
       }
     },
     async decrement(item) {
-      console.log(item)
-      const _item_cart = {...this.getCartItems};
-      console.log(item, _item_cart)
-
-      // this.isDisbale = !this.isDisbale
-      // await this.$store.dispatch('cart/newOrderCreate', this.dataFormat({data: item, method: 'dec'}))
+      const _item_cart = JSON.parse(JSON.stringify(this.getCartItems));
+      _item_cart.items.map((el) => {
+        if (el.id === item.id && el.count < el.amount) {
+          el.count+=1;
+          return el;
+        } else {
+          return  el;
+        }
+      })
+      await this.$store.dispatch('cart/orderItemsCount', _item_cart)
       // await this.getCartItemList(this.$route.query.order_id)
       // this.isDisbale = !this.isDisbale
       // await this.$store.dispatch('cart/getCardItem', {id: this.$route.query.order_id, })
     },
     async increment(item) {
       this.isDisbale = true
-      await this.$store.dispatch('cart/newOrderCreate', this.dataFormat({data: item, method: 'inc'}))
-      await this.getCartItemList(this.$route.query.order_id)
+      // await this.$store.dispatch('cart/newOrderCreate', this.dataFormat({data: item, method: 'inc'}))
+      const _item_cart = JSON.parse(JSON.stringify(this.getCartItems));
+      _item_cart.items.map((el) => {
+        if (el.id === item.id && el.count > el.min_amount) {
+          el.count-=1;
+          return el;
+        } else {
+          return  el;
+        }
+      })
+      await this.$store.dispatch('cart/orderItemsCount', _item_cart)
       this.isDisbale = false;
 
     },

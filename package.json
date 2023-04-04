@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "nuxt --dotenv --port 3000",
-    "prod": "nuxt --dotenv .env.production",
+    "prod": "NODE_ENV=production nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate"

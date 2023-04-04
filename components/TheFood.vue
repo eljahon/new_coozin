@@ -153,6 +153,9 @@ export default {
   }
     },
   },
+  mounted() {
+    this.count = this.item.min_amount
+  }
 }
 </script>
 

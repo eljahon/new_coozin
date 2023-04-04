@@ -8,15 +8,21 @@ export default function ({ $axios, redirect, $auth, app }) {
     const token = app.$auth.strategy.token.get().split(' ')[1]
     $axios.setToken(token, 'Bearer') // Here we specify the token and now it works!!
   }
-  $axios.setBaseURL(process.env.VUE_APP_BASE_URL)
+  $axios.setBaseURL(process.env.BASE_URL)
   $axios.onRequest((config) => {
     config.paramsSerializer = function (params) {
       return qs.stringify(filterNonNull(params), { encodeValuesOnly: true })
     }
   })
   $axios.onError((error) => {
+    console.log(error)
     const code = parseInt(error.response.status)
+    const {data: {message}} = error.response;
+    if(message) {
+      app.$toast.error(message)
+    }
     if (code === 400) {
+      // app.$toast.error('error status code  '+code)
       return
     }
     if (code === 401) {

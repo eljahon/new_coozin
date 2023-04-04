@@ -1,18 +1,33 @@
 export const state = () => ({
   cartList: null,
   cartItem: null,
-  totalPrice: null
+  totalPrice: null,
+  foodsTime: null,
+  worktimeList: null,
+  isWorktime: false,
+  timList: null,
+  preparation_time: null,
 })
 export const getters = {
   getCartItems: (state) => state.cartItem,
-  getVendors: (state) => state.cartList
+  getVendors: (state) => state.cartList,
+
 };
 export const mutations = {
+  SET_FOODS_TIME: (state, payload) => {
+    state.foodsTime = payload
+  },
+  SET_PR_TIME: (state, payload) => {
+    state.preparation_time = payload
+  },
+  SET_TIME_LIST: (state, payload) => {
+    state.timList = payload
+  },
+  SET_VENDOR_TIME: (state, payload) => {
+    state.worktimeList = payload
+  },
   SET_CART_LIST: (state, payload) => {
     state.cartList = payload
-  },
-  SET_TOTAL_PRICE: (state, payaload) => {
-    state.totalPrice = payaload
   },
   SET_CART_ITEM: (state, payload) => {
     state.cartItem = payload
@@ -23,7 +38,14 @@ export const actions = {
     try {
       const {data: {results}} = await this.$axios.get('carts', {
         params: {
-          ...payload
+          populate: 'vendor,user,vendor.user,order_items',
+          filters: {
+            user: {
+              id: {
+                $eq: this.$auth.user.id
+              }
+            }
+          }
         }
       })
       const formatData = results.map((el, index) => {
@@ -40,19 +62,19 @@ export const actions = {
       throw new Error(err);
     }
   },
-  async getCardItem({commit}, payload) {
+  async getCardItem({commit, dispatch}, payload) {
     try {
       const id = payload.id;
       delete payload.id;
-      const populate = 'order_items, vendor, vendor.user, vendor.user.avatar,order_items.product,order_items.product.media'
+      const populate = 'order_items,vendor,user,vendor.user,vendor.user.avatar,order_items.product,order_items.product.media'
       const {data} = await this.$axios.get(`carts/${id}`, {params: {populate, ...payload}})
-      console.log(data)
       const newdata = {
         id: data.id,
         vendor_img: data.vendor.user.avatar.aws_path,
         full_name: data.vendor.user.first_name + " " + data.vendor.user.last_name,
-        total_price: data.order_items.reduce((acc, el) => acc + el.price, 0),
+        total_price: data.order_items.reduce((acc, el) => acc + (el.price * el.count), 0),
         vendor_id: data.vendor.id,
+        user: data.user.id,
         items: data?.order_items?.map((el, index) => {
           return {
             count: el.count,
@@ -62,13 +84,18 @@ export const actions = {
             min_amount: el.product?.min_amount,
             name: el.product.name,
             vendor_id: data.vendor.id,
-            amount: el.product.amount
+            preparation_time: el.product.preparation_time,
+            amount: el.product.amount,
+            product: el.product.id
           }
         })
 
       }
-      commit('SET_CART_ITEM', newdata)
-      return newdata;
+      // console.log('salom==============')
+      commit('SET_CART_ITEM', newdata);
+      const _timedata = newdata.items.map(el => el.preparation_time)
+      commit('SET_PR_TIME', _timedata)
+      return _timedata;
     } catch (err) {
       return err
     }
@@ -100,5 +127,104 @@ export const actions = {
     } catch (err) {
       throw  new Error(err)
     }
+  },
+  async serverTime({commit, state}, payload) {
+    try {
+      const {data} = await this.$axios.get(`server/time`);
+      return data;
+    } catch (err) {
+      throw  new Error(err)
+    }
+  },
+  async orderItemsCount({commit, dispatch, state}, payload) {
+    try {
+      const id = payload.id;
+      const data = {
+        vendor: payload.vendor_id,
+        user: payload.user,
+        items: payload.items.map((el) => {
+          return {
+            count: el.count,
+            product: el.product
+          }
+        })
+      }
+      await dispatch('newOrderCreate', data)
+      await dispatch('getCardItem', {id})
+      // commit('SET_CART_ITEM', payload)
+    } catch (err) {
+      throw  new Error(err)
+    }
+  },
+  async getDishs({commit}, payload) {
+    try {
+      const {id} = payload;
+      const {data} = this.$axios.get(`/dishes/cart/${id}`, {
+        params: {
+          populate: '*',
+          locale: this.$i18n.locale
+        }
+      })
+      console.log(data)
+      return data;
+      // commit('SET_CART_ITEM', payload)
+    } catch (err) {
+      throw  new Error(err)
+    }
+  },
+  async getSetting({commit}, payload) {
+    try {
+      const {data} = await this.$axios.get(`setting`, {
+        params: {
+          populate: '*',
+          locale: this.$i18n.locale
+        }
+      })
+      commit('SET_VENDOR_TIME', data)
+      return data;
+      // commit('SET_CART_ITEM', payload)
+    } catch (err) {
+      throw  new Error(err)
+    }
+  },
+  timeGeneret({commit, state}, payload) {
+    const _dateNow = this.$dayjs().format('HH:mm').split(':').map(Number);
+    const _maxTime = Math.max(...payload)
+    const _oldTime = payload.filter((el) => el !== _maxTime).reduce((acc, el) => acc + (el * 0.25), 0);
+    const _allTime = _dateNow[1] + _maxTime + _oldTime;
+    let _pripretionTimes = this.$dayjs(this.$dayjs().minute(_allTime)).format('HH:mm');
+    let _beginHours = _pripretionTimes.split(':').map(Number)[0];
+    let _beginMinuts = _pripretionTimes.split(':').map(Number)[1];
+    let timeList = [];
+    while (_beginHours < 21) {
+      timeList.push({
+        label: `${this.$dayjs(this.$dayjs().hour(_beginHours)).format('HH:mm')}-${this.$dayjs(this.$dayjs().hour(_beginHours+1)).format('HH:mm')}`,
+        value: `${this.$dayjs(this.$dayjs().hour(_beginHours).minute(30)).format('HH:mm')}`,
+      })
+      _beginHours++;
+    }
+    commit('SET_TIME_LIST', timeList)
+    // commit('SET_FOODS_TIME', newdata.items.map((el) =>el.preparation_time));
+    // if (allTime> 60  && dateNow[0] > 21 && dateNow[0] <9) {
+    //
+    // }
+  },
+  isToDay({commit, state}, payload) {
+    const _prTime = JSON.parse(JSON.stringify(state.preparation_time))
+    const _maxTime = Math.max(..._prTime)
+    const _oldTime = _prTime.filter((el) => el !== _maxTime).reduce((acc, el) => acc + (el * 0.25), 0);
+    const _allTime = _maxTime + _oldTime + state.worktimeList.max_delivery_time;
+    let _pripretionTimes = this.$dayjs(this.$dayjs().hour(9).minute(_allTime)).format('HH:mm');
+    let _beginHours = _pripretionTimes.split(':').map(Number)[0];
+    let _beginMinuts = _pripretionTimes.split(':').map(Number)[1];
+    let timeList = [];
+    while (_beginHours < 21) {
+      timeList.push({
+        label: `${this.$dayjs(this.$dayjs().hour(_beginHours)).format('HH:mm')}-${this.$dayjs(this.$dayjs().hour(_beginHours+1)).format('HH:mm')}`,
+        value: `${this.$dayjs(this.$dayjs().hour(_beginHours).minute(30)).format('HH:mm')}`,
+      })
+      _beginHours++;
+    }
+    commit('SET_TIME_LIST', timeList)
   }
 };

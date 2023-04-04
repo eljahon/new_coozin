@@ -3,7 +3,8 @@ export const state = () => ({
   login: false,
   register: false,
   burger: false,
-  food: false, 
+  mapOrder: false,
+  food: false,
   monthNames: {
     "01": 'Yan',
     "02": 'Fer',
@@ -24,6 +25,9 @@ export const state = () => ({
 export const mutations = {
   SET_DAY: (state, payload) => {
     state.days_list = payload
+  },
+  SET_MAPS_ORDER: (state, payload) => {
+    state.mapOrder = payload
   },
   // FOOD_MODAL: (state, payload) => {
   //   state.food = payload
@@ -46,13 +50,13 @@ export const actions = {
       '1': 'monday',
       '2': 'tuesday',
       '3': 'wednesday',
-      '4': 'thursaday',
+      '4': 'thursday',
       '5': 'friday',
-      '6': 'satuday'
+      '6': 'saturday'
     }
     for (let i=0; i<7; i++) {
     days.push({
-      date: this.$dayjs(new Date ()).add(i, 'day').format('YYYY-MM-DD d'),
+      date: this.$dayjs(new Date ()).add(i, 'day').format('YYYY-MM-DD'),
       seeDate: this.$dayjs(new Date ()).add(i, 'day').format('DD'),
       name: state.monthNames[this.$dayjs(new Date ()).add(i, 'day').format('YYYY-MM-DD').split('-')[1]],
      weekday: weekDay[Number(this.$dayjs(new Date ()).add(i, 'day').format('d'))]
@@ -60,9 +64,22 @@ export const actions = {
     };
     commit('SET_DAY', days)
   },
-  async setVendorWeekday ({commit,state}, res) {
+  async setVendorWeekday ({commit,state}, payload) {
+    const vendorWorkingday =[...payload];
+    console.log(vendorWorkingday)
     const dayList = JSON.parse(JSON.stringify(state.days_list))
-    console.log(state.dayList)
+    const workingDay = dayList.map((el) => {
+      console.log(el.weekday)
+      if(vendorWorkingday.includes(el.weekday)) {
+        el['isWorkDay'] = false;
+        return el;
+      } else {
+        el['isWorkDay'] = true;
+        return el;
+      }
+    })
+    console.log(dayList)
+    commit('SET_DAY', dayList)
   },
   async setUser ({commit}, res) {
     try {
@@ -74,6 +91,10 @@ export const actions = {
       console.log(this.$auth)
     } catch (err) {
     }
+  },
+  setMapOrder({commit}, payload) {
+    console.log(payload)
+    commit('SET_MAPS_ORDER', payload)
   },
   // set_location ({commit}, payload) {
   //   commit('SET_LOCATION', payload)

@@ -22,6 +22,9 @@ export default {
     ],
   },
   target: 'server',
+  env: {
+    baseUrl: process.env.BASE_URL || 'https://backend.coozin.uz/api/'
+  },
   css: [
     "@/assets/css/main.css",
     "@assets/css/tailwind.css"
