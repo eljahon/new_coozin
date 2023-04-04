@@ -376,8 +376,7 @@ export default {
     onChildClick(event) {
       console.log('Child clicked');
       event.stopPropagation();
-    }
-  },
+    },
     selectOption(item) {
       this.selectedOption = item;
       console.log(item)
