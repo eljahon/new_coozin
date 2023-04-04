@@ -27,6 +27,7 @@
                   </div>
                 </div>
               </div>
+<!--              user_adress-->
               <ValidationProvider
                 v-slot='{ errors }'
                 name='user_adress'
@@ -50,7 +51,7 @@
                         autocomplete="off"
                         v-model="order_form.user_adress"
                         :class="errors.length ? 'border-red-500 border-2' : ''"
-                        class="block pl-11 input-styles w-full px-4 py-2 text-gray-700 placeholder-gray-400 border text-gray-500 rounded-lg border-gray-200 pr-2 pl-11 text-base h-12 focus:outline-none focus:border-orange-600"
+                        class="block pl-11 input-styles w-full px-4 py-2 text-gray-700 placeholder-gray-400 border text-gray-500 rounded-lg border-gray-200 text-base focus:outline-none focus:border-orange-600"
                         :placeholder="$t('matonat-street')+', 35'"
                         @focus="showOptions = true"
                         @blur="showOptions=false"
@@ -76,6 +77,7 @@
                   </div>
                 </div>
               </ValidationProvider>
+<!--              payment_type -->
               <ValidationProvider
                 v-slot='{ errors }'
                 name='payment_type'
@@ -85,21 +87,29 @@
                 <div class="flex flex-col gap-3 input-styles sm:w-96 w-80 input-400 mt-6">
                   <label for="payment_type" :class="errors.length ? 'text-red-500' : ''"
                          class="font-medium text-gray-700">{{ $t('payment-method') }}</label>
-                  <div class="relative">
-                    <select
-                      class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
-                      id="payment_type"
-                      :class="{'border-red-500 border-2': errors.length, 'bg-gray-200': isAdders}"
-                      name="payment_typee"
-                      v-model="order_form.payment_type"
-                      style="-webkit-appearance: none;"
-                    >
-                      <option v-for="(item, ind) in paymentType" :key="ind" :value="item.value">{{ $t(item.label) }}
-                      </option>
-                    </select>
-                    <img class="absolute position" src="../../../assets/svg/cash.svg" alt="Input icon">
-                    <img class="absolute position-rigth" src="../../../assets/svg/arrow-bottom.svg" alt="Arrow icon">
-                  </div>
+                  <thedropdwon
+                    @@custom-click="onChildClick"
+                    id="payment_type"
+                    name="payment_type"
+                    :placeholder="$t('payment_type')"
+                    v-model="order_form.payment_type"
+                    :errors="errors.length!==0 ? true : false"
+                    :options="paymentType"></thedropdwon>
+<!--                  <div class="relative">-->
+<!--                    <select-->
+<!--                      class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"-->
+<!--                      id="payment_type"-->
+<!--                      :class="{'border-red-500 border-2': errors.length, 'bg-gray-200': isAdders}"-->
+<!--                      name="payment_typee"-->
+<!--                      v-model="order_form.payment_type"-->
+<!--                      style="-webkit-appearance: none;"-->
+<!--                    >-->
+<!--                      <option v-for="(item, ind) in paymentType" :key="ind" :value="item.value">{{ $t(item.label) }}-->
+<!--                      </option>-->
+<!--                    </select>-->
+<!--                    <img class="absolute position" src="../../../assets/svg/cash.svg" alt="Input icon">-->
+<!--                    <img class="absolute position-rigth" src="../../../assets/svg/arrow-bottom.svg" alt="Arrow icon">-->
+<!--                  </div>-->
                 </div>
               </ValidationProvider>
             </div>
@@ -113,6 +123,7 @@
                   </div>
                 </div>
               </div>
+<!--              comment-->
               <the-input
                 styles="flex flex-col gap-3 w-full"
                 label-styles="font-medium text-gray-700"
@@ -135,20 +146,27 @@
                   <label for="payment_type" :class="errors.length ? 'text-red-500' : ''"
                          class="font-medium text-gray-700">{{ $t('my-cards') }}</label>
                   <div class="flex gap-2">
-                    <div class="relative w-full">
-                      <select
-                        class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"
-                        id="payment_type"
-                        :class="errors.length ? 'border-red-500 border-2' : ''"
-                        name="payment_typee"
-                        v-model="order_form.card_id"
-                        style="-webkit-appearance: none;"
-                      >
-                        <option v-for="(item, ind) in cardList" :key="ind" :value="item.value">{{ item.label }}</option>
-                      </select>
-                      <img class="absolute position" src="../../../assets/svg/cash.svg" alt="Input icon">
-                      <img class="absolute position-rigth" src="../../../assets/svg/arrow-bottom.svg" alt="Arrow icon">
-                    </div>
+                    <thedropdwon
+                      id="card_id"
+                      name="card_id"
+                      :placeholder="$t('my-cards')"
+                      v-model="order_form.card_id"
+                      :errors="errors.length!==0 ? true : false"
+                      :options="cardList"></thedropdwon>
+<!--                    <div class="relative w-full">-->
+<!--                      <select-->
+<!--                        class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"-->
+<!--                        id="payment_type"-->
+<!--                        :class="errors.length ? 'border-red-500 border-2' : ''"-->
+<!--                        name="payment_typee"-->
+<!--                        v-model="order_form.card_id"-->
+<!--                        style="-webkit-appearance: none;"-->
+<!--                      >-->
+<!--                        <option v-for="(item, ind) in cardList" :key="ind" :value="item.value">{{ item.label }}</option>-->
+<!--                      </select>-->
+<!--                      <img class="absolute position" src="../../../assets/svg/cash.svg" alt="Input icon">-->
+<!--                      <img class="absolute position-rigth" src="../../../assets/svg/arrow-bottom.svg" alt="Arrow icon">-->
+<!--                    </div>-->
                     <div class="map-card" @click="addCardModalOpen">
                       <the-icon src="plus"/>
                     </div>
@@ -158,6 +176,7 @@
             </div>
 
           </div>
+<!--          delivery_time-->
           <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
             <div class="flex items-center justify-between sm:w-96 w-80 input-400">
               <ValidationProvider
@@ -171,7 +190,13 @@
                   <label for="dilevery-time" :class="errors.length ? 'text-red-500' : ''"
                          class="font-medium text-gray-700">{{ $t('time-delivery') }}</label>
 
-                  <thedropdwon :placeholder="'13:00 -14:00'" v-model="order_form.delivery_time" :options="$store.state.cart.timList"></thedropdwon>
+                  <thedropdwon
+                    id="delivery_time"
+                    name="delivery_time"
+                    :placeholder="'13:00 -14:00'"
+                    v-model="order_form.delivery_time"
+                    :errors="errors.length!==0 ? true : false"
+                    :options="$store.state.cart.timList"></thedropdwon>
 
                 </div>
               </ValidationProvider>
@@ -184,6 +209,7 @@
                       :date="item"
                       :isWorkDay="item.isWorkDay"
                       :variant="true"
+                      :isActive="item.isActive"
                       @onDates="setDateSelect"
                     />
                   </div>
@@ -240,8 +266,8 @@
         </div>
       </div>
     </div>
-    <div class="flex justify-center">
-    </div>
+<!--    <div class="flex justify-center">-->
+<!--    </div>-->
     <order-yandex-maps :is-maps="$store.state.mapOrder" :set-is-maps="setIsMaps"
                        @changePlice="changePlice"></order-yandex-maps>
     <cards-form-modal :fetach="getMyCard"/>
@@ -279,7 +305,7 @@ export default {
       seeletLocation: {},
       order_form: {
         user: this?.$auth?.user?.id,
-        payment_type: 3,
+        payment_type: null,
         user_adress: '',
         is_later: false,
         delivery_price: null,
@@ -338,12 +364,20 @@ export default {
       } else {
         this.$store.dispatch('set_day')
       }
-    }
+    },
+    // 'order_form.delivery_time': function (val) {
+    //   console.log(val)
+    // }
   },
   methods: {
     checkfoodTime() {
       console.log(this.$store.state.cart.foodsTime)
     },
+    onChildClick(event) {
+      console.log('Child clicked');
+      event.stopPropagation();
+    }
+  },
     selectOption(item) {
       this.selectedOption = item;
       console.log(item)
@@ -651,8 +685,8 @@ export default {
   background: #FFFFFF;
   box-shadow: -3px -2px 20px -10px rgba(0, 0, 0, 0.19), 0px 4px 7px -1px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;

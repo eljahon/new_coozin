@@ -198,7 +198,7 @@ export const actions = {
     let timeList = [];
     while (_beginHours < 21) {
       timeList.push({
-        label: `${this.$dayjs(this.$dayjs().hour(_beginHours)).format('HH:mm')}-${this.$dayjs(this.$dayjs().hour(_beginHours+1)).format('HH:mm')}`,
+        label: `${this.$dayjs(this.$dayjs().hour(_beginHours)).minute(0).format('HH:mm')}-${this.$dayjs(this.$dayjs().hour(_beginHours+1)).minute(0).format('HH:mm')}`,
         value: `${this.$dayjs(this.$dayjs().hour(_beginHours).minute(30)).format('HH:mm')}`,
       })
       _beginHours++;
@@ -220,7 +220,7 @@ export const actions = {
     let timeList = [];
     while (_beginHours < 21) {
       timeList.push({
-        label: `${this.$dayjs(this.$dayjs().hour(_beginHours)).format('HH:mm')}-${this.$dayjs(this.$dayjs().hour(_beginHours+1)).format('HH:mm')}`,
+        label: `${this.$dayjs(this.$dayjs().hour(_beginHours)).minute(0).format('HH:mm')}-${this.$dayjs(this.$dayjs().hour(_beginHours+1)).minute(0).format('HH:mm')}`,
         value: `${this.$dayjs(this.$dayjs().hour(_beginHours).minute(30)).format('HH:mm')}`,
       })
       _beginHours++;

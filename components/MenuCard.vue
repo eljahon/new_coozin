@@ -5,17 +5,17 @@
     w-40 p-2 rounded-lg bg-gray-200 border
     active:border-orange-600 hover:border-orange-600
     hover:bg-white cursor-pointer"
-    :class="{ 'w-10 h-14': variant, 'pointer-events-none bg-gray-100':isWorkDay }"
+    :class="{ 'w-10 h-14': variant, 'pointer-events-none bg-gray-100':isWorkDay, 'bg-white border-orange-600': isActive }"
   >
     <span
       class="font-semibold leading-5 text-xl text-gray-600 group-active:text-orange-600 group-hover:text-orange-600"
-      :class="{ 'text-xs leading-4': variant, 'text-gray-300': isWorkDay }"
+      :class="{ 'text-xs leading-4': variant, 'text-gray-300': isWorkDay, 'text-orange-600': isActive }"
     >
       {{date.seeDate}}
     </span>
       <span
         class="font-semibold leading-5 text-sm text-gray-600 group-active:text-orange-600 group-hover:text-orange-600"
-        :class="{ 'text-xs leading-4': variant, 'text-gray-300': isWorkDay }"
+        :class="{ 'text-xs leading-4': variant, 'text-gray-300': isWorkDay, 'text-orange-600': isActive }"
       >
       {{ date.name }}
     </span>
@@ -24,7 +24,7 @@
 
 <script>
 export default {
-  props: ['date', 'month', 'variant', 'isWorkDay'],
+  props: ['date', 'month', 'variant', 'isWorkDay', "isActive"],
   data ()  {
     return {
       monthNames: {
@@ -44,6 +44,7 @@ export default {
   },
   methods: {
     onClick () {
+      this.$store.dispatch('setAticeDay', this.date.date)
       this.$emit('onDates', {day: this.date.date})
     },
   }

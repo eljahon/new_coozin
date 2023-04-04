@@ -118,7 +118,6 @@ export default {
       this.searchList = [];
     },
     closedMap() {
-      console.log(this.$route.path)
       if (this.$route.path === '/'||this.$route.path === '/uz/' && this.markerIcon.length) {
         this.$routePush({...this.$route.query,maps: undefined, lat:this.markerIcon[0], long: this.markerIcon[1]})
       }
