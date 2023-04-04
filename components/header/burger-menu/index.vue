@@ -1,28 +1,16 @@
 <template>
   <div>
-    <!-- <div v-if="false" class="burger p-4" :class="{'open':$store.state.burger}">
-      <div class="bg-white rounded-2xl flex flex-col gap-2 w-full mb-4">
-        <h3 class="text-xl font-semibold text-gray-800">{{ user.full_name }}</h3>
-        <h6 class="text-xs text-color-700 font-medium">Coozin кошелёк:</h6>
-        <div class="flex gap-2">
-          <the-icon src="coin" />
-          <h4 class="text-xl text-color-700 font-semibold">{{ user.balance }} сум</h4>
-        </div>
-      </div>
-      <div class="bg-white rounded-2xl flex flex-col gap-6 w-full">
-        <div v-for="(item, idx) in profile" :key="idx">
-          <div @click="handleRoute(item)">
-            <div class="flex gap-4 cursor-pointer">
-              <the-icon :src="item.icon" />
-              <h4 class="text-color-700 font-normal">{{ item.title }}</h4>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div> -->
     <div class="burger px-6 py-4" :class="{'open':$store.state.burger}">
       <div class="bg-white rounded-2xl flex flex-col gap-2 w-full mb-4">
         <div class="bg-white rounded-2xl flex flex-col gap-6 w-full">
+          <div class="flex items-center justify-between">
+            <the-logo />
+            <header-card addStyle="w-12">
+              <div @click="$store.dispatch('burgerOpen', false)">
+                <the-icon src="x"/>
+              </div>
+            </header-card>
+          </div>
           <div @click="goToPage('/')">
             <div class="flex gap-4 cursor-pointer">
               <h4 class="text-color-700 font-normal">{{ $t('main') }}</h4>
@@ -49,6 +37,8 @@
 </template>
 
 <script>
+import HeaderCard from "~/components/header/header-card";
+
 export default {
   data() {
     return {
@@ -113,32 +103,10 @@ export default {
       ]
     }
   },
-  head () {
-    return {
-      bodyAttrs: {
-        // class: this.$store.state.burger ? 'overflow-hidden' : ''
-      }
-    }
-  },
-  mounted() {
-    // if(this.$auth.state.loggedIn) {
-    //   this.getUser()
-    // }
+  components: {
+    'header-card': HeaderCard
   },
   methods: {
-    // handleRoute(item) {
-    //   this.$store.dispatch('burgerOpen', false)
-    //   if (item.name) {
-    //     this.$router.push({ path: this.localePath('/profile'), query: {name: item.name}})
-    //   } else {
-    //     this.$router.push({ path: this.localePath(item.link)})
-    //     // return {
-    //     //   path: this.localePath(this.$route.path), query: {
-    //     //     name: item.name
-    //     //   }
-    //     // }
-    //   }
-    // },
     goToPage(route) {
       this.$store.dispatch('burgerOpen', false)
       this.$router.push({
@@ -153,7 +121,7 @@ export default {
 .burger {
   position: fixed;
   z-index: 12;
-  top: 78px;
+  top: 0;
   bottom: 0;
   left: -350px;
   width: 350px;
@@ -172,10 +140,5 @@ export default {
 }
 .open {
   left: 0;
-}
-@media screen and (max-width: 640px) {
-  .burger {
-    top: 72px;
-  }
 }
 </style>

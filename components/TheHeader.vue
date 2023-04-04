@@ -12,13 +12,13 @@
           <div class="sm:block hidden">
             <the-logo />
           </div>
-          <div class="sm:hidden block w-28" :class="search ? 'hidden' : ''">
+          <div class="sm:hidden block w-28" addStyle="w-12" :class="search ? 'hidden' : ''">
             <the-logo />
           </div>
         </div>
         <div class="lg:flex hidden items-center gap-3">
           <div @click="search = !search">
-            <header-card>
+            <header-card addStyle="w-12">
               <the-icon :src="search ? 'x' : 'search'"/>
             </header-card>
           </div>
@@ -82,7 +82,7 @@
               @input="goToSearch"
             >
             <div @click="search = !search">
-              <header-card>
+              <header-card addStyle="w-12">
                 <the-icon :src="search ? 'x' : 'search'"/>
               </header-card>
             </div>
@@ -297,8 +297,6 @@ try {
 
 <style scoped>
 .header {
-  position: relative;
-  z-index: 10;
   background: #ffffff;
 }
 

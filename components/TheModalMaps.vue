@@ -163,7 +163,7 @@ export default {
 
 .multiple-modal > div {
   overflow: hidden;
-  height: 86%;
+  height: 80%;
 }
 
 .ymaps-2-1-79-map {

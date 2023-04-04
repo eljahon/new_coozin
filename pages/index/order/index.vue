@@ -9,14 +9,13 @@
 
     </div>
     <div class="container mx-auto flex gap-9 xl:px-0 xl:flex-nowrap	flex-wrap px-2">
-
       <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
         <form novalidate class="bg-white w-full p-6 rounded-lg" @submit.prevent="handleSubmit(orderCreate)">
           <h1 class="font-semibold text-gray-800 text-2xl">{{ $t('decor-order') }}</h1>
           <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
             <div>
               <!--        is_later-->
-              <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between">
+              <!-- <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between">
                 <div class="relative w-full">
                   <div class="flex items-center pl-4 rounded dark:border-gray-700">
                     <input id="bordered-checkbox-1" type="checkbox" v-model="order_form.is_later" value=""
@@ -27,7 +26,8 @@
                   </div>
                 </div>
               </div>
-<!--              user_adress-->
+
+               </div> -->
               <ValidationProvider
                 v-slot='{ errors }'
                 name='user_adress'
@@ -51,7 +51,7 @@
                         autocomplete="off"
                         v-model="order_form.user_adress"
                         :class="errors.length ? 'border-red-500 border-2' : ''"
-                        class="block pl-11 input-styles w-full px-4 py-2 text-gray-700 placeholder-gray-400 border text-gray-500 rounded-lg border-gray-200 text-base focus:outline-none focus:border-orange-600"
+                        class="block pl-11 input-styles w-full px-4 py-2 placeholder-gray-400 border text-gray-500 rounded-lg border-gray-200 text-base focus:outline-none focus:border-orange-600"
                         :placeholder="$t('matonat-street')+', 35'"
                         @focus="showOptions = true"
                         @blur="showOptions=false"
@@ -206,7 +206,7 @@
             <div class="mt-14">
               <div class="max-w-sm overflow-x-scroll scroll-style" v-if="order_form.is_later">
                 <div class=" sm:flex items-center gap-3.5">
-                  <div v-for="item in $store.state.days_list" class="sm:flex">
+                  <div v-for="(item, index) in $store.state.days_list" :key="index" class="sm:flex">
                     <menu-card
                       :date="item"
                       :isWorkDay="item.isWorkDay"
@@ -255,7 +255,7 @@
         <h2 class="font-semibold text-gray-800 text-2xl mx-2">{{ $t('your-order') }}</h2>
         <div class="flex flex-col gap-3 overflow-y-scroll scroll-style pl-2 pr-4" style="max-height: 516px;">
           <div v-if="getCartItems && getCartItems.items && getCartItems.items.length">
-            <div v-for="item in getCartItems.items">
+            <div v-for="(item, index) in getCartItems.items" :key="index">
               <div class="flex gap-4">
                 <div class="w-24 h-24 overflow-hidden border border-gray-100 rounded-lg">
                   <img class="w-full" :src="$img+item.image" alt="Food Image">
@@ -311,7 +311,7 @@ export default {
         user: this?.$auth?.user?.id,
         payment_type: null,
         user_adress: '',
-        is_later: false,
+        is_later: true,
         delivery_price: null,
         delivery_time: null,
         comment: this.$route.query.comment_text,
