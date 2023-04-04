@@ -10,7 +10,7 @@
     </div>
     <div class="container mx-auto flex gap-9 xl:px-0 xl:flex-nowrap	flex-wrap px-2">
 
-      <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }" slim>
+      <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
         <form novalidate class="bg-white w-full p-6 rounded-lg" @submit.prevent="handleSubmit(orderCreate)">
           <h1 class="font-semibold text-gray-800 text-2xl">{{ $t('decor-order') }}</h1>
           <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
@@ -243,7 +243,9 @@
             </div>
           </div>
           <button type="submit"
-                  class="w-full bg-gray-300 h-12 rounded-3xl text-gray-400 font-semibold mt-12 cursor-pointer">
+                  class="w-full  h-12 rounded-3xl   mt-12 cursor-pointer"
+                  :class="{'bg-orange-600 text-white':!invalid,'text-gray-400 font-semibold bg-gray-300': invalid }"
+          >
             {{ $t('pay') }}
           </button>
         </form>
@@ -315,11 +317,12 @@ export default {
         comment: this.$route.query.comment_text,
         cart: this.$route.query.cart_id,
         dish_items: [],
-        isDateNow: false,
-        severTime: null,
-        vendorWorktime: null,
-        isSubimt: true
+
       },
+      isDateNow: false,
+      severTime: null,
+      vendorWorktime: null,
+      isSubimt: true,
       cardList: [],
       isCardOpen: false,
       selectDay: null
@@ -493,7 +496,7 @@ export default {
       try {
         const _order_form = {
           ...this.order_form,
-          delivery_time: this.selectDay ? this.selectDay + this.order_form.delivery_time : this.$dayjs().format('YYYY-MM-DD')+' '+this.order_form.delivery_time,
+          delivery_time: this.selectDay ? this.selectDay+' ' + this.order_form.delivery_time : this.$dayjs().format('YYYY-MM-DD')+' '+this.order_form.delivery_time,
           user_adress: this.address_id[0],
         }
         const data = await this.$axios.post('orders', {..._order_form})
