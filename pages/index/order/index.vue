@@ -9,7 +9,6 @@
 
     </div>
     <div class="container mx-auto flex gap-9 xl:px-0 xl:flex-nowrap	flex-wrap px-2">
-
       <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
         <form novalidate class="bg-white w-full p-6 rounded-lg" @submit.prevent="handleSubmit(orderCreate)">
           <h1 class="font-semibold text-gray-800 text-2xl">{{ $t('decor-order') }}</h1>

@@ -12,23 +12,23 @@
     <div class="container mx-auto">
       <div class="container mx-auto flex gap-5 xl:px-0 sm:px-4 px-2 md:flex-nowrap flex-wrap">
         <div class="w-96 flex flex-col gap-5 shrink-0 rwd-width mx-auto">
-          <div class="switch" @click="switchOn = !switchOn">
-            <div class="switch-item delay-300" :class="{ 'switch-right': switchOn, 'switch-left': !switchOn }"></div>
-            <div>
-              <span :class="{'text-orange-600': !switchOn, 'text-gray-500': switchOn}">{{$t('active')}}</span>
+          <div class="w-full bg-white rounded-3xl items-center h-12 flex justify-between p-3">
+            <div @click="ativeTab('active')" class="w-1/2  py-2 px-4 items-center text-center" :class="{'bg-orange-100 rounded-3xl': !isActive}">
+              <span :class="{'text-orange-600 font-bold': !isActive, 'text-gray-500': isActive}">{{$t('active')}}</span>
             </div>
-            <div>
-              <span :class="{'text-orange-600': switchOn, 'text-gray-500': !switchOn}">{{$t('orders_history')}}</span>
+            <div @click="ativeTab('isactive')" class="w-1/2  py-2 px-4 items-center text-center" :class="{'bg-orange-100 rounded-3xl': isActive}">
+              <span :class="{'text-orange-600 font-bold': isActive, 'text-gray-500': !isActive}">{{$t('history')}}</span>
             </div>
           </div>
-          <div v-if="!switchOn" class="flex flex-col px-4 gap-3 mt-5 md:h-96 h-48 scroll-style	overflow-y-scroll">
+
+          <div class="flex flex-col px-4 gap-3 mt-5 md:h-96 h-48 scroll-style	overflow-y-scroll">
             <div
               v-for="item in orderProgress"
               @click="getOrderDetail(item)"
               class="p-4 cursor-pointer bg-white rounded-lg flex items-center justify-between rwd-card"
             >
-              <h4 class="font-medium text-lg text-gray-800">Заказ №{{ item.id }}</h4>
-              <the-icon :src="item.status === 'pending' ? 'order-clock' : '' " />
+              <h4 class="font-medium text-lg text-gray-800">{{$t('order')}} № {{ item.id }}</h4>
+              <span class="rounded-full bg-gray-100 w-10 h-10 p-2"><the-icon :src="item.order_status.name" /></span>
             </div>
 <!--            <div class="p-4 cursor-pointer bg-white rounded-lg flex items-center justify-between">-->
 <!--              <h4 class="font-medium text-lg text-gray-800">Заказ №1881</h4>-->
@@ -43,371 +43,368 @@
 <!--              <the-icon src="order-delivery" />-->
 <!--            </div>-->
           </div>
-          <div v-else class="flex flex-col px-4 gap-3 mt-5 md:h-96 h-48 scroll-style	overflow-y-scroll">
-            <div @click="getOrderDetail(item)" v-for="item in orderHistory" class="p-4 cursor-pointer bg-white rounded-lg flex items-center justify-between">
-              <h4 class="font-medium text-lg text-gray-800">Заказ №{{ item.id }}</h4>
-              <the-icon :src="item.status === 'cancelled' ? 'ban' : 'order-confirmed'" />
-            </div>
-          </div>
+<!--          <div v-else class="flex flex-col px-4 gap-3 mt-5 md:h-96 h-48 scroll-style	overflow-y-scroll">-->
+<!--            <div @click="getOrderDetail(item)" v-for="item in orderHistory" class="p-4 cursor-pointer bg-white rounded-lg flex items-center justify-between">-->
+<!--              <h4 class="font-medium text-lg text-gray-800">Заказ №{{ item.id }}</h4>-->
+<!--              <the-icon :src="item.order_status.name === 'cancelled' ? 'ban' : 'order-confirmed'" />-->
+<!--            </div>-->
+<!--          </div>-->
         </div>
-        <div
-          v-if="orderDetail.status === 'pending'"
-          class="p-6 bg-white rounded-2xl flex xl:flex-nowrap flex-wrap gap-4 items-center justify-center w-full"
-        >
-          <div class="flex flex-col text-center items-center justify-between xl:h-full h-64 xl:w-1/2 w-80">
-            <h2 class="font-bold text-2xl text-gray-800">Заказ №{{ orderDetail.id }}</h2>
-            <div class="relative">
-              <the-icon class="relative z-10" src="order-1" />
-              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-0 left-6"></div>
-              <p class="font-medium text-gray-800 mt-8 text-center">Заказ ожидает принятия....</p>
-            </div>
-            <button
-              @click="cancelOrder"
-              class="w-80 py-3 bg-blue-100 rounded-3xl cursor-pointer
-              outline-none font-semibold text-gray-800 w-none-1140"
-            >
-              Отменить заказ
-            </button>
-          </div>
-          <div class="xl:w-1/2 w-80 bg-white">
-            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">
-              <div class="flex flex-col gap-2.5">
-                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>
-                <p class="text-gray-800">Повар: <span class="font-semibold">{{ orderDetail?.vendor?.user?.full_name }}</span></p>
-              </div>
-              <div class="flex flex-col">
-                <div v-for="item in orderDetail.food" class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">{{ item.name }}</h4>
-                  <p class="text-gray-800 font-semibold">{{ item.min_amount }}x {{ item.price }} сум /<span class="font-normal">{{ item.unit?.name }}</span></p>
-                </div>
-              </div>
-              <div class="border-b border-gray-200 py-2">
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Блюда</h5>
-                  <h5 class="text-gray-700">{{ orderDetail.order_price }} сум</h5>
-                </div>
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Доставка</h5>
-                  <h5 class="text-gray-700">{{ orderDetail?.delivery_price }} сум</h5>
-                </div>
-              </div>
-              <div class="flex justify-between">
-                <h5 class="text-gray-800 font-bold">Итого</h5>
-                <h5 class="text-gray-800 font-bold">{{ orderDetail.total_price }} сум</h5>
-              </div>
-            </div>
-            <button
-              @click="cancelOrder(orderDetail)"
-              class="w-80 py-3 bg-blue-100 rounded-3xl cursor-pointer
-              outline-none font-semibold text-gray-800 w-block-1140"
-            >
-              Отменить заказ
-            </button>
-          </div>
-        </div>
-        <div
-          v-else-if="false"
-          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"
-        >
-          <div class="flex flex-col text-center items-center justify-between h-full xl:w-1/2">
-            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>
-            <div class="relative">
-              <the-icon class="relative z-10" src="order-2" />
-              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-0 left-6"></div>
-              <p class="font-medium text-gray-800 mt-8 text-center">Ваш заказ принят</p>
-            </div>
-            <button
-              class="w-80 py-3 bg-blue-100 rounded-3xl cursor-pointer
-              outline-none font-semibold text-gray-800"
-            >
-              Отменить заказ
-            </button>
-          </div>
-          <div class="xl:w-1/2 bg-white">
-            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">
-              <div class="flex flex-col gap-2.5">
-                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>
-                <p class="text-gray-800">Повар: <span class="font-semibold">Гульбахор Касымова</span></p>
-              </div>
-              <div class="flex flex-col">
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-              </div>
-              <div class="border-b border-gray-200 py-2">
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Блюда</h5>
-                  <h5 class="text-gray-700">270 000 сум</h5>
-                </div>
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Доставка</h5>
-                  <h5 class="text-gray-700">10 000 сум</h5>
-                </div>
-              </div>
-              <div class="flex justify-between">
-                <h5 class="text-gray-800 font-bold">Итого</h5>
-                <h5 class="text-gray-800 font-bold">230 000 сум</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          v-else-if="false"
-          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"
-        >
-          <div class="flex flex-col text-center items-center gap-7 h-full xl:w-1/2">
-            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>
-            <div class="relative">
-              <the-icon class="relative z-10" src="order-3" />
-              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-8 left-2"></div>
-              <p class="font-medium text-gray-800 mt-8 text-center">Заказ готовится</p>
-            </div>
-          </div>
-          <div class="xl:w-1/2 bg-white">
-            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">
-              <div class="flex flex-col gap-2.5">
-                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>
-                <p class="text-gray-800">Повар: <span class="font-semibold">Гульбахор Касымова</span></p>
-              </div>
-              <div class="flex flex-col">
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-              </div>
-              <div class="border-b border-gray-200 py-2">
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Блюда</h5>
-                  <h5 class="text-gray-700">270 000 сум</h5>
-                </div>
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Доставка</h5>
-                  <h5 class="text-gray-700">10 000 сум</h5>
-                </div>
-              </div>
-              <div class="flex justify-between">
-                <h5 class="text-gray-800 font-bold">Итого</h5>
-                <h5 class="text-gray-800 font-bold">230 000 сум</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          v-else-if="false"
-          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"
-        >
-          <div class="flex flex-col text-center items-center justify-between h-full xl:w-1/2">
-            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>
-            <div class="relative">
-              <the-icon class="relative z-10" src="order-4" />
-              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-0 left-12"></div>
-              <p class="font-medium text-gray-800 mt-2 translate-x-6">Заказ в пути</p>
-            </div>
-            <div class="w-80 py-4 px-3 bg-gray-100 rounded-2xl flex items-center justify-between">
-              <div class="flex items-center gap-2 text-left">
-                <div class="avatar">
-                  <img class="w-full object-cover" src="https://i.pravatar.cc/101" alt="Avatar">
-                </div>
-                <div>
-                  <h6 class="font-semibold text-xs text-gray-700 leading-3">Азиз Каримов</h6>
-                  <span class="text-xs text-gray-700">курьер</span>
-                </div>
-              </div>
-              <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center cursor-pointer">
-                <the-icon src="phone" />
-              </div>
-            </div>
-          </div>
-          <div class="xl:w-1/2 bg-white">
-            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">
-              <div class="flex flex-col gap-2.5">
-                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>
-                <p class="text-gray-800">Повар: <span class="font-semibold">Гульбахор Касымова</span></p>
-              </div>
-              <div class="flex flex-col">
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-              </div>
-              <div class="border-b border-gray-200 py-2">
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Блюда</h5>
-                  <h5 class="text-gray-700">270 000 сум</h5>
-                </div>
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Доставка</h5>
-                  <h5 class="text-gray-700">10 000 сум</h5>
-                </div>
-              </div>
-              <div class="flex justify-between">
-                <h5 class="text-gray-800 font-bold">Итого</h5>
-                <h5 class="text-gray-800 font-bold">230 000 сум</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          v-else-if="false"
-          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"
-        >
-          <div class="flex flex-col text-center items-center gap-16 h-full xl:w-1/2">
-            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>
-            <div class="relative">
-              <the-icon class="relative z-10" src="order-5" />
-              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-0 left-6"></div>
-              <p class="font-medium text-gray-800 mt-8 text-center">Пожалуйста оцените заказ :)</p>
-            </div>
-          </div>
-          <div class="xl:w-1/2 bg-white flex flex-col gap-4">
-            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">
-              <h4 class="font-semibold text-gray-700 text-center">Как вам доставка?</h4>
-              <div class="flex items-end justify-center gap-12">
-                <div class="flex flex-col gap-1 items-center cursor-pointer">
-                  <the-icon src="emoj-1" />
-                  <h6 class="text-xs text-gray-600">Опоздали(</h6>
-                </div>
-                <div class="flex flex-col gap-1 items-center cursor-pointer">
-                  <the-icon src="emoj-2" />
-                  <h6 class="text-xs text-gray-600">Во время!</h6>
-                </div>
-              </div>
-            </div>
-            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">
-              <h4 class="font-semibold text-gray-700 text-center">Как вам еда?</h4>
-              <div class="flex items-end justify-center gap-12">
-                <div class="flex flex-col gap-1 items-center cursor-pointer">
-                  <the-icon src="emoj-3" />
-                  <h6 class="text-xs text-gray-600">Так себе</h6>
-                </div>
-                <div class="flex flex-col gap-1 items-center cursor-pointer">
-                  <the-icon src="emoj-4" />
-                  <h6 class="text-xs text-gray-600">Вкусно!</h6>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          v-else-if="false"
-          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"
-        >
-          <div class="flex flex-col text-center items-center gap-12 h-full xl:w-1/2">
-            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>
-            <div class="relative">
-              <the-icon class="relative z-10" src="order-6" />
-              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute -top-2 left-3"></div>
-              <p class="font-medium text-gray-800 mt-8 text-center">Спасибо за ваш отзыв!</p>
-            </div>
-          </div>
-          <div class="xl:w-1/2 bg-white">
-            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">
-              <div class="flex flex-col gap-2.5">
-                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>
-                <p class="text-gray-800">Повар: <span class="font-semibold">Гульбахор Касымова</span></p>
-              </div>
-              <div class="flex flex-col">
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-                <div class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">Куриный суп</h4>
-                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>
-                </div>
-              </div>
-              <div class="border-b border-gray-200 py-2">
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Блюда</h5>
-                  <h5 class="text-gray-700">270 000 сум</h5>
-                </div>
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Доставка</h5>
-                  <h5 class="text-gray-700">10 000 сум</h5>
-                </div>
-              </div>
-              <div class="flex justify-between">
-                <h5 class="text-gray-800 font-bold">Итого</h5>
-                <h5 class="text-gray-800 font-bold">230 000 сум</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-          v-else-if="orderDetail.status === 'cancelled'"
-          class="p-6 bg-white rounded-2xl flex xl:flex-nowrap flex-wrap gap-4 items-center justify-center w-full"
-        >
-          <div class="flex flex-col text-center items-center justify-between xl:h-full h-64 xl:w-1/2 w-80">
-            <h2 class="font-bold text-2xl text-gray-800">Заказ №{{ orderDetail.id }}</h2>
-            <div class="relative">
-              <the-icon class="relative z-10" src="order-7" />
-              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute -top-2 left-4"></div>
-              <p class="font-medium text-gray-800 mt-8 text-center">Заказ отменён</p>
-            </div>
-          </div>
-          <div class="xl:w-1/2 bg-white">
-            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">
-              <div class="flex flex-col gap-2.5">
-                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>
-                <p class="text-gray-800">Повар: <span class="font-semibold">{{ orderDetail?.vendor?.user?.full_name }}</span></p>
-              </div>
-              <div class="flex flex-col">
-                <div v-for="item in orderDetail.food" class="border-b border-gray-200 py-2">
-                  <h4 class="text-gray-700">{{ item.name }}</h4>
-                  <p class="text-gray-800 font-semibold">{{ item.min_amount }}x {{ item.price }} сум /<span class="font-normal">{{ item.unit?.name }}</span></p>
-                </div>
-              </div>
-              <div class="border-b border-gray-200 py-2">
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Блюда</h5>
-                  <h5 class="text-gray-700">{{ orderDetail.order_price }} сум</h5>
-                </div>
-                <div class="flex justify-between">
-                  <h5 class="text-gray-700">Доставка</h5>
-                  <h5 class="text-gray-700">{{ orderDetail?.delivery_price }} сум</h5>
-                </div>
-              </div>
-              <div class="flex justify-between">
-                <h5 class="text-gray-800 font-bold">Итого</h5>
-                <h5 class="text-gray-800 font-bold">{{ orderDetail.total_price }} сум</h5>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div v-else class="p-6 w-full flex bg-white rounded-2xl items-center justify-center gap-14">
-          <div class="flex flex-col gap-14">
-            <the-icon src="order-empty" class="mx-auto" />
-            <p class="font-medium	md:text-xl text-lg text-gray-800">Выберите свой заказ чтобы посмотреть</p>
-          </div>
+<!--        <div-->
+<!--          v-if="!!orderDetail?.order_status?.name === 'pending'"-->
+<!--          class="p-6 bg-white rounded-2xl flex xl:flex-nowrap flex-wrap gap-4 items-center justify-center w-full"-->
+<!--        >-->
+<!--          <div class="flex flex-col text-center items-center justify-between xl:h-full h-64 xl:w-1/2 w-80">-->
+<!--            <h2 class="font-bold text-2xl text-gray-800">Заказ №{{ orderDetail.id }}</h2>-->
+<!--            <div class="relative">-->
+<!--              <the-icon class="relative z-10" src="order-1" />-->
+<!--              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-0 left-6"></div>-->
+<!--              <p class="font-medium text-gray-800 mt-8 text-center">Заказ ожидает принятия....</p>-->
+<!--            </div>-->
+<!--            <button-->
+<!--              @click="cancelOrder"-->
+<!--              class="w-80 py-3 bg-blue-100 rounded-3xl cursor-pointer-->
+<!--              outline-none font-semibold text-gray-800 w-none-1140"-->
+<!--            >-->
+<!--              Отменить заказ-->
+<!--            </button>-->
+<!--          </div>-->
+<!--          <div class="xl:w-1/2 w-80 bg-white">-->
+<!--            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">-->
+<!--              <div class="flex flex-col gap-2.5">-->
+<!--                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>-->
+<!--                <p class="text-gray-800">Повар: <span class="font-semibold">{{ orderDetail?.vendor?.user?.full_name }}</span></p>-->
+<!--              </div>-->
+<!--              <div class="flex flex-col">-->
+<!--                <div v-for="item in orderDetail.food" class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">{{ item.name }}</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">{{ item.min_amount }}x {{ item.price }} сум /<span class="font-normal">{{ item.unit?.name }}</span></p>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="border-b border-gray-200 py-2">-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Блюда</h5>-->
+<!--                  <h5 class="text-gray-700">{{ orderDetail.order_price }} сум</h5>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Доставка</h5>-->
+<!--                  <h5 class="text-gray-700">{{ orderDetail?.delivery_price }} сум</h5>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="flex justify-between">-->
+<!--                <h5 class="text-gray-800 font-bold">Итого</h5>-->
+<!--                <h5 class="text-gray-800 font-bold">{{ orderDetail.total_price }} сум</h5>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <button-->
+<!--              @click="cancelOrder(orderDetail)"-->
+<!--              class="w-80 py-3 bg-blue-100 rounded-3xl cursor-pointer-->
+<!--              outline-none font-semibold text-gray-800 w-block-1140"-->
+<!--            >-->
+<!--              Отменить заказ-->
+<!--            </button>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div-->
+<!--          v-else-if="false"-->
+<!--          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"-->
+<!--        >-->
+<!--          <div class="flex flex-col text-center items-center justify-between h-full xl:w-1/2">-->
+<!--            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>-->
+<!--            <div class="relative">-->
+<!--              <the-icon class="relative z-10" src="order-2" />-->
+<!--              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-0 left-6"></div>-->
+<!--              <p class="font-medium text-gray-800 mt-8 text-center">Ваш заказ принят</p>-->
+<!--            </div>-->
+<!--            <button-->
+<!--              class="w-80 py-3 bg-blue-100 rounded-3xl cursor-pointer-->
+<!--              outline-none font-semibold text-gray-800"-->
+<!--            >-->
+<!--              Отменить заказ-->
+<!--            </button>-->
+<!--          </div>-->
+<!--          <div class="xl:w-1/2 bg-white">-->
+<!--            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">-->
+<!--              <div class="flex flex-col gap-2.5">-->
+<!--                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>-->
+<!--                <p class="text-gray-800">Повар: <span class="font-semibold">Гульбахор Касымова</span></p>-->
+<!--              </div>-->
+<!--              <div class="flex flex-col">-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="border-b border-gray-200 py-2">-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Блюда</h5>-->
+<!--                  <h5 class="text-gray-700">270 000 сум</h5>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Доставка</h5>-->
+<!--                  <h5 class="text-gray-700">10 000 сум</h5>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="flex justify-between">-->
+<!--                <h5 class="text-gray-800 font-bold">Итого</h5>-->
+<!--                <h5 class="text-gray-800 font-bold">230 000 сум</h5>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div-->
+<!--          v-else-if="false"-->
+<!--          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"-->
+<!--        >-->
+<!--          <div class="flex flex-col text-center items-center gap-7 h-full xl:w-1/2">-->
+<!--            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>-->
+<!--            <div class="relative">-->
+<!--              <the-icon class="relative z-10" src="order-3" />-->
+<!--              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-8 left-2"></div>-->
+<!--              <p class="font-medium text-gray-800 mt-8 text-center">Заказ готовится</p>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="xl:w-1/2 bg-white">-->
+<!--            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">-->
+<!--              <div class="flex flex-col gap-2.5">-->
+<!--                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>-->
+<!--                <p class="text-gray-800">Повар: <span class="font-semibold">Гульбахор Касымова</span></p>-->
+<!--              </div>-->
+<!--              <div class="flex flex-col">-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="border-b border-gray-200 py-2">-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Блюда</h5>-->
+<!--                  <h5 class="text-gray-700">270 000 сум</h5>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Доставка</h5>-->
+<!--                  <h5 class="text-gray-700">10 000 сум</h5>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="flex justify-between">-->
+<!--                <h5 class="text-gray-800 font-bold">Итого</h5>-->
+<!--                <h5 class="text-gray-800 font-bold">230 000 сум</h5>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div-->
+<!--          v-else-if="false"-->
+<!--          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"-->
+<!--        >-->
+<!--          <div class="flex flex-col text-center items-center justify-between h-full xl:w-1/2">-->
+<!--            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>-->
+<!--            <div class="relative">-->
+<!--              <the-icon class="relative z-10" src="order-4" />-->
+<!--              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-0 left-12"></div>-->
+<!--              <p class="font-medium text-gray-800 mt-2 translate-x-6">Заказ в пути</p>-->
+<!--            </div>-->
+<!--            <div class="w-80 py-4 px-3 bg-gray-100 rounded-2xl flex items-center justify-between">-->
+<!--              <div class="flex items-center gap-2 text-left">-->
+<!--                <div class="avatar">-->
+<!--                  <img class="w-full object-cover" src="https://i.pravatar.cc/101" alt="Avatar">-->
+<!--                </div>-->
+<!--                <div>-->
+<!--                  <h6 class="font-semibold text-xs text-gray-700 leading-3">Азиз Каримов</h6>-->
+<!--                  <span class="text-xs text-gray-700">курьер</span>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center cursor-pointer">-->
+<!--                <the-icon src="phone" />-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="xl:w-1/2 bg-white">-->
+<!--            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">-->
+<!--              <div class="flex flex-col gap-2.5">-->
+<!--                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>-->
+<!--                <p class="text-gray-800">Повар: <span class="font-semibold">Гульбахор Касымова</span></p>-->
+<!--              </div>-->
+<!--              <div class="flex flex-col">-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="border-b border-gray-200 py-2">-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Блюда</h5>-->
+<!--                  <h5 class="text-gray-700">270 000 сум</h5>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Доставка</h5>-->
+<!--                  <h5 class="text-gray-700">10 000 сум</h5>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="flex justify-between">-->
+<!--                <h5 class="text-gray-800 font-bold">Итого</h5>-->
+<!--                <h5 class="text-gray-800 font-bold">230 000 сум</h5>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div-->
+<!--          v-else-if="false"-->
+<!--          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"-->
+<!--        >-->
+<!--          <div class="flex flex-col text-center items-center gap-16 h-full xl:w-1/2">-->
+<!--            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>-->
+<!--            <div class="relative">-->
+<!--              <the-icon class="relative z-10" src="order-5" />-->
+<!--              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute top-0 left-6"></div>-->
+<!--              <p class="font-medium text-gray-800 mt-8 text-center">Пожалуйста оцените заказ :)</p>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="xl:w-1/2 bg-white flex flex-col gap-4">-->
+<!--            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">-->
+<!--              <h4 class="font-semibold text-gray-700 text-center">Как вам доставка?</h4>-->
+<!--              <div class="flex items-end justify-center gap-12">-->
+<!--                <div class="flex flex-col gap-1 items-center cursor-pointer">-->
+<!--                  <the-icon src="emoj-1" />-->
+<!--                  <h6 class="text-xs text-gray-600">Опоздали(</h6>-->
+<!--                </div>-->
+<!--                <div class="flex flex-col gap-1 items-center cursor-pointer">-->
+<!--                  <the-icon src="emoj-2" />-->
+<!--                  <h6 class="text-xs text-gray-600">Во время!</h6>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">-->
+<!--              <h4 class="font-semibold text-gray-700 text-center">Как вам еда?</h4>-->
+<!--              <div class="flex items-end justify-center gap-12">-->
+<!--                <div class="flex flex-col gap-1 items-center cursor-pointer">-->
+<!--                  <the-icon src="emoj-3" />-->
+<!--                  <h6 class="text-xs text-gray-600">Так себе</h6>-->
+<!--                </div>-->
+<!--                <div class="flex flex-col gap-1 items-center cursor-pointer">-->
+<!--                  <the-icon src="emoj-4" />-->
+<!--                  <h6 class="text-xs text-gray-600">Вкусно!</h6>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div-->
+<!--          v-else-if="false"-->
+<!--          class="w-8/12 flex shrink-0 bg-white rounded-2xl justify-center p-12 gap-14"-->
+<!--        >-->
+<!--          <div class="flex flex-col text-center items-center gap-12 h-full xl:w-1/2">-->
+<!--            <h2 class="font-bold text-2xl text-gray-800">Заказ №1881</h2>-->
+<!--            <div class="relative">-->
+<!--              <the-icon class="relative z-10" src="order-6" />-->
+<!--              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute -top-2 left-3"></div>-->
+<!--              <p class="font-medium text-gray-800 mt-8 text-center">Спасибо за ваш отзыв!</p>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="xl:w-1/2 bg-white">-->
+<!--            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">-->
+<!--              <div class="flex flex-col gap-2.5">-->
+<!--                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>-->
+<!--                <p class="text-gray-800">Повар: <span class="font-semibold">Гульбахор Касымова</span></p>-->
+<!--              </div>-->
+<!--              <div class="flex flex-col">-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--                <div class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">Куриный суп</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">2x 30 000 сум /<span class="font-normal">порция</span></p>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="border-b border-gray-200 py-2">-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Блюда</h5>-->
+<!--                  <h5 class="text-gray-700">270 000 сум</h5>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Доставка</h5>-->
+<!--                  <h5 class="text-gray-700">10 000 сум</h5>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="flex justify-between">-->
+<!--                <h5 class="text-gray-800 font-bold">Итого</h5>-->
+<!--                <h5 class="text-gray-800 font-bold">230 000 сум</h5>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div-->
+<!--          v-else-if="orderDetail.status === 'cancelled'"-->
+<!--          class="p-6 bg-white rounded-2xl flex xl:flex-nowrap flex-wrap gap-4 items-center justify-center w-full"-->
+<!--        >-->
+<!--          <div class="flex flex-col text-center items-center justify-between xl:h-full h-64 xl:w-1/2 w-80">-->
+<!--            <h2 class="font-bold text-2xl text-gray-800">Заказ №{{ orderDetail.id }}</h2>-->
+<!--            <div class="relative">-->
+<!--              <the-icon class="relative z-10" src="order-7" />-->
+<!--              <div class="w-40 h-40 bg-gray-100 rounded-full mx-auto absolute -top-2 left-4"></div>-->
+<!--              <p class="font-medium text-gray-800 mt-8 text-center">Заказ отменён</p>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--          <div class="xl:w-1/2 bg-white">-->
+<!--            <div class="border border-gray-100 rounded-2xl p-5 gap-5 flex flex-col">-->
+<!--              <div class="flex flex-col gap-2.5">-->
+<!--                <h2 class="text-gray-800 font-semibold text-lg">Детали заказа</h2>-->
+<!--                <p class="text-gray-800">Повар: <span class="font-semibold">{{ orderDetail?.vendor?.user?.full_name }}</span></p>-->
+<!--              </div>-->
+<!--              <div class="flex flex-col">-->
+<!--                <div v-for="item in orderDetail.food" class="border-b border-gray-200 py-2">-->
+<!--                  <h4 class="text-gray-700">{{ item.name }}</h4>-->
+<!--                  <p class="text-gray-800 font-semibold">{{ item.min_amount }}x {{ item.price }} сум /<span class="font-normal">{{ item.unit?.name }}</span></p>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="border-b border-gray-200 py-2">-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Блюда</h5>-->
+<!--                  <h5 class="text-gray-700">{{ orderDetail.order_price }} сум</h5>-->
+<!--                </div>-->
+<!--                <div class="flex justify-between">-->
+<!--                  <h5 class="text-gray-700">Доставка</h5>-->
+<!--                  <h5 class="text-gray-700">{{ orderDetail?.delivery_price }} сум</h5>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--              <div class="flex justify-between">-->
+<!--                <h5 class="text-gray-800 font-bold">Итого</h5>-->
+<!--                <h5 class="text-gray-800 font-bold">{{ orderDetail.total_price }} сум</h5>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+        <div class="p-6 w-full flex bg-white rounded-2xl items-center justify-center gap-14">
+          <status-components :status="status" :order-item="orderDetail"/>
         </div>
       </div>
     </div>
@@ -415,15 +412,21 @@
 </template>
 
 <script>
+import  statusComponents from '~/components/order-status-components/index'
 export default {
+  components: {
+    statusComponents
+  },
   data() {
     return {
       switchOn: false,
+      isActive: false,
       orders: [],
       orderHistory: [],
       orderProgress: [],
       orderDetail: [],
-      isCanseled: true
+      isCanseled: true,
+      status: 'default'
     }
   },
   async fetch() {
@@ -436,8 +439,15 @@ export default {
   },
 
   methods: {
+    ativeTab (tabname) {
+      if (tabname === 'active') {
+        this.isActive = false
+      } else {
+        this.isActive = true
+      }
+    },
     async getOrders() {
-    const {data} = await this.$axios.get('orders', {
+    const {data: {results}} = await this.$axios.get('orders', {
         params: {
           populate: '*',
           filters: {
@@ -449,21 +459,23 @@ export default {
           }
         }
       })
-        this.orderProgress = data.filter(res => res.status === "pending")
-        this.orderHistory = data.filter(res => res.status === "cancelled" || res.status === "finished")
-        this.orders = data
+      console.log()
+        this.orderProgress = results.filter(res => res.order_status.name === "pending")
+        this.orderHistory = results.filter(res => res.status === "cancelled" || res.status === "finished")
+        this.orders = results
     },
     getOrderDetail(item) {
-      this.orderDetail = item
+      this.orderDetail = item;
+      console.log(item)
     },
-    async cancelOrder () {
-      const data  = await this.$axios.patch(`/orders/${this.orderDetail.id}/cancel`);
-      this.$toast.success('order canceled')
-      await this.getOrders()
-      const {objects: {status}} = data;
-      this.switchOn = true;
-      this.orderDetail = data.objects;
-    }
+    // async cancelOrder () {
+    //   const data  = await this.$axios.patch(`/orders/${this.orderDetail.id}/cancel`);
+    //   this.$toast.success('order canceled')
+    //   await this.getOrders()
+    //   const {objects: {status}} = data;
+    //   this.switchOn = true;
+    //   this.orderDetail = data.objects;
+    // }
   }
 }
 </script>
