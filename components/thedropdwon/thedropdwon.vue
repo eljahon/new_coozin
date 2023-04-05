@@ -1,7 +1,7 @@
 <template>
-  <div class="relative w-full">
-    <div    :class="errors ? 'border-red-500 border-2' : ''" class="mt-3 flex justify-between items-center border-gray-200 border px-4 rounded-lg" @click="click">
-      <img :src="require(`~/assets/svg/cash.svg`)"
+  <div class="relative w-full h-12">
+    <div :class="errors ? 'border-red-500 border-2' : ''" class="mt-3 h-full flex justify-between items-center border-gray-200 border px-4 rounded-lg" @click="click">
+      <img :src="require(`~/assets/svg/${iconName}.svg`)"
            :alt="'location' + 'svg'">
       <input
         type="text"
@@ -60,6 +60,10 @@ export default {
     selected: {
       type: Boolean,
       default: () => false
+    },
+    iconName: {
+      type: String,
+      required: false,
     }
   },
   data() {

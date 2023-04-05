@@ -8,26 +8,206 @@
       <span class="text-sm font-medium text-gray-500 cursor-pointer">{{ $t('decor-order') }}</span>
 
     </div>
-    <div class="container mx-auto flex gap-9 xl:px-0 xl:flex-nowrap	flex-wrap px-2">
-      <ValidationObserver class="w-full" ref="observer" v-slot="{ handleSubmit, invalid }">
+    <div class="container mx-auto flex gap-9 xl:px-0 justify-center xl:flex-nowrap flex-wrap px-2">
+      <ValidationObserver ref="observer" v-slot="{ handleSubmit, invalid }">
         <form novalidate class="bg-white w-full p-6 rounded-lg" @submit.prevent="handleSubmit(orderCreate)">
-          <h1 class="font-semibold text-gray-800 text-2xl">{{ $t('decor-order') }}</h1>
-          <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
-            <div>
-              <!--        is_later-->
-              <!-- <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between">
+          <h1 class="font-semibold text-gray-800 text-2xl mb-5">{{ $t('decor-order') }}</h1>
+
+          <!-- Dilevery Adress -->
+          <h2 class="font-semibold text-xl text-gray-700">{{ $t('dilevery-address') }}</h2>
+          <div class="my-3 flex xl:justify-between justify-center gap-4 md:flex-nowrap flex-wrap">
+            <ValidationProvider
+              v-slot='{ errors }'
+              name='user_adress'
+              rules='required'
+              mode='eager'
+              class="md:w-full sm:w-96 w-80"
+            >
+              <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between sm:w-96 w-80 input-400">
                 <div class="relative w-full">
-                  <div class="flex items-center pl-4 rounded dark:border-gray-700">
-                    <input id="bordered-checkbox-1" type="checkbox" v-model="order_form.is_later" value=""
-                           name="bordered-checkbox"
-                           class="w-4 h-4 text-orange-500 bg-orange-500 rounded focus:ring-blue-500 dark:focus:ring-blue-500 dark:ring-offset-orange-500 focus:ring-2">
-                    <label for="bordered-checkbox-1"
-                           class="w-2/12 py-4 ml-2 font-medium text-gray-900 dark:text-gray-300">{{ $t('is-later') }}</label>
+                  <div class="flex w-full">
+                    <label for="address" :class="errors.length ? 'font-medium text-red-500' : 'font-medium text-gray-700'">
+                      {{ $t('delivery-place') }}
+                    </label>
+                  </div>
+                  <div class="relative mt-3">
+                    <input
+                      type="text"
+                      ref="inputaddress"
+                      name="user_adress"
+                      autocomplete="off"
+                      v-model="order_form.user_adress"
+                      :class="errors.length ? 'border-red-500 border-2' : ''"
+                      class="bg-white pr-2 outline-orange-600 w-full block pl-11 h-12 input-styles px-4 py-2 placeholder-gray-400 border text-gray-500 rounded-lg border-gray-200 text-base focus:outline-none focus:border-orange-600"
+                      :placeholder="$t('matonat-street')+', 35'"
+                      @focus="showOptions = true"
+                      @blur="showOptions=false"
+                      :readonly="true"
+                    />
+                    <img class="absolute position" :src="require(`~/assets/svg/location.svg`)"
+                          :alt="'location' + 'svg'">
+
+                  </div>
+                  <div v-if="showOptions" class="absolute z-10 w-full mt-1 bg-white rounded-lg shadow-lg">
+                    <ul class="h-[300px] overflow-y-scroll scroll-style" @mousedown.prevent>
+                      <li v-for="(item, index) in userAddress" class="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                          :key="index" @click.stop="orderAddress(item)">{{ item.address }}
+                      </li>
+                    </ul>
                   </div>
                 </div>
-              </div>
 
-               </div> -->
+                <div class="map-card" @click="openMaps">
+                  <the-icon src="map"/>
+                </div>
+              </div>
+            </ValidationProvider>
+            <the-input
+              styles="flex flex-col gap-3 md:w-full sm:w-96 w-80"
+              label-styles="font-medium text-gray-700"
+              input-styles="sm:w-96 w-80 input-400 rounded-lg"
+              type="text"
+              icon="office"
+              name="address"
+              :label="$t('reference-point')"
+              :placeholder="$t('matonat-street')+', 35'"
+              :v-model="order_form.comment"
+            />   
+          </div>
+
+          
+          <!-- Dilevery Time -->
+          <h2 class="font-semibold text-xl text-gray-700 mb-2 mt-5">{{ $t('dilevery-time') }}</h2>
+          <div class="my-3 flex xl:justify-between justify-center gap-4 md:flex-nowrap flex-wrap">
+            <ValidationProvider
+              v-slot='{ errors }'
+              name='delivery_time'
+              rules='required'
+              mode='eager'
+              class="md:w-full sm:w-96 w-80"
+            >
+              <div class="flex flex-col input-styles sm:w-96 w-80 input-400">
+                <label 
+                  for="dilevery-time" 
+                  :class="errors.length ? 'text-red-500' : ''"
+                  class="font-medium text-gray-700"
+                >
+                  {{ $t('day') }}
+                </label>
+
+                <thedropdwon
+                  v-if="true"
+                  id="delivery_time"
+                  name="delivery_time"
+                  iconName="calendar"
+                  selected
+                  :placeholder="'13:00 -14:00'"
+                  v-model="order_form.delivery_time"
+                  :errors="errors.length!==0 ? true : false"
+                  :options="$store.state.cart.timList">
+                </thedropdwon>
+                <!-- Add Card -->
+                <div v-else class="w-full border border-gray-200 rounded-md h-12 flex items-center justify-center p-3.5">
+                  <the-icon width="10" height="10" name="plus" />
+                </div>
+
+              </div>
+            </ValidationProvider>
+            <ValidationProvider
+              v-slot='{ errors }'
+              name='delivery_time'
+              rules='required'
+              mode='eager'
+              class="md:w-full sm:w-96 w-80"
+            >
+              <div class="flex flex-col input-styles sm:w-96 w-80 input-400">
+                <label 
+                  for="dilevery-time" 
+                  :class="errors.length ? 'text-red-500' : ''"
+                  class="font-medium text-gray-700"
+                >
+                  {{ $t('time') }}
+                </label>
+
+                <thedropdwon
+                  id="delivery_time"
+                  name="delivery_time"
+                  iconName="clock-gray"
+                  selected
+                  :placeholder="$t('usually-order')"
+                  v-model="order_form.is_later"
+                  :errors="errors.length !== 0 ? true : false"
+                  :options="options_later"></thedropdwon>
+
+              </div>
+            </ValidationProvider>  
+          </div>
+
+          <!-- Dilevery Time -->
+          <h2 class="font-semibold text-xl text-gray-700 mb-2 mt-7">{{ $t('payment') }}</h2>
+          <div class="my-3 flex xl:justify-between justify-center gap-4 md:flex-nowrap flex-wrap">
+            <ValidationProvider
+              v-slot='{ errors }'
+              name='delivery_time'
+              rules='required'
+              mode='eager'
+              class="md:w-full sm:w-96 w-80"
+            >
+              <div class="flex flex-col input-styles sm:w-96 w-80 input-400">
+                <label 
+                  for="dilevery-time" 
+                  :class="errors.length ? 'text-red-500' : ''"
+                  class="font-medium text-gray-700"
+                >
+                  {{ $t('card-for-payment') }}
+                </label>
+
+                <thedropdwon
+                  id="delivery_time"
+                  name="delivery_time"
+                  iconName="calendar"
+                  selected
+                  :placeholder="'13:00 -14:00'"
+                  v-model="order_form.delivery_time"
+                  :errors="errors.length!==0 ? true : false"
+                  :options="$store.state.cart.timList"></thedropdwon>
+
+              </div>
+            </ValidationProvider>
+            <div class="md:w-full sm:w-96 w-80 items-end xl:m-0 mt-5">
+            <h3 class="text-lg font-semibold text-gray-700">{{ $t('to-pay') }}</h3>
+            <div class="rounded-lg p-3 total_summ -mx-0 mt-2">
+              <div class="flex justify-between">
+                <h4 class="text-gray-600">{{ $t('dishes') }}</h4>
+                <h4 class="font-medium text-gray-600">{{ getCartItems.total_price }} {{ $t('sum') }}</h4>
+              </div>
+              <div class="flex justify-between my-2">
+                <h4 class="text-gray-600">{{ $t('delivery') }}</h4>
+                <h4 class="font-medium text-gray-600"> {{ del_price > 0 ? del_price : 9000 + ' +' }}
+                  {{ $t('sum') }}</h4>
+              </div>
+              <div class="flex justify-between">
+                <h4 class="font-bold text-gray-600">{{ $t('total') }}</h4>
+                <h4 v-if="getCartItems?.delivery_price !== null" class="font-bold text-gray-600">
+                  {{ formatPrice(getCartItems) + (del_price > 0 ? del_price : 9000) }} {{ $t('sum') }}
+                </h4>
+              </div>
+            </div>
+          </div>
+          </div>
+
+
+
+
+
+
+
+
+          <!-- Old code -->
+
+
+          <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
+            <div>
               <ValidationProvider
                 v-slot='{ errors }'
                 name='user_adress'
@@ -38,10 +218,12 @@
                 <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between">
                   <div class="relative w-full">
                     <div class="flex w-full">
-                      <label for="address"
-                             :class="errors.length ? 'font-medium text-red-500' : 'font-medium text-gray-700'">{{
-                          $t('delivery-place')
-                        }}</label>
+                      <label 
+                        for="address"
+                        :class="errors.length ? 'font-medium text-red-500' : 'font-medium text-gray-700'"
+                      >
+                        {{ $t('delivery-place')}}
+                      </label>
                     </div>
                     <div class="relative mt-3">
                       <input
@@ -77,7 +259,7 @@
                   </div>
                 </div>
               </ValidationProvider>
-<!--              payment_type -->
+<!--  -->
               <ValidationProvider
                 v-slot='{ errors }'
                 name='payment_type'
@@ -90,27 +272,13 @@
                   <thedropdwon
                     id="payment_type"
                     name="payment_type"
+                    iconName="x"
                     selected
                     :placeholder="$t('payment_type')"
                     v-model="order_form.payment_type"
                     :errors="errors.length!==0 ? true : false"
                     :options="paymentType">
                   </thedropdwon>
-<!--                  <div class="relative">-->
-<!--                    <select-->
-<!--                      class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"-->
-<!--                      id="payment_type"-->
-<!--                      :class="{'border-red-500 border-2': errors.length, 'bg-gray-200': isAdders}"-->
-<!--                      name="payment_typee"-->
-<!--                      v-model="order_form.payment_type"-->
-<!--                      style="-webkit-appearance: none;"-->
-<!--                    >-->
-<!--                      <option v-for="(item, ind) in paymentType" :key="ind" :value="item.value">{{ $t(item.label) }}-->
-<!--                      </option>-->
-<!--                    </select>-->
-<!--                    <img class="absolute position" src="../../../assets/svg/cash.svg" alt="Input icon">-->
-<!--                    <img class="absolute position-rigth" src="../../../assets/svg/arrow-bottom.svg" alt="Arrow icon">-->
-<!--                  </div>-->
                 </div>
               </ValidationProvider>
             </div>
@@ -118,13 +286,16 @@
               <div class="flex items-end sm:gap-2.5 gap-1.5 justify-between">
                 <div class="relative w-full">
                   <div class="flex items-center pl-4 rounded dark:border-gray-700">
-                    <!--                  <input id="bordered-checkbox-1" type="checkbox" v-model="order_form.is_later" value="" name="bordered-checkbox" class="w-4 h-4 text-orange-500 bg-orange-500 rounded focus:ring-blue-500 dark:focus:ring-blue-500 dark:ring-offset-orange-500 focus:ring-2">-->
-                    <label for="bordered-checkbox-1"
-                           class="w-full py-4 ml-2 text-sm font-medium text-gray-900 opacity-0 dark:text-gray-300">{{ $t('is-later') }}</label>
+                    <label 
+                      for="bordered-checkbox-1"
+                      class="w-full py-4 ml-2 text-sm font-medium text-gray-900 opacity-0 dark:text-gray-300"
+                    >
+                      {{ $t('is-later') }}
+                    </label>
                   </div>
                 </div>
               </div>
-<!--              comment-->
+
               <the-input
                 styles="flex flex-col gap-3 w-full"
                 label-styles="font-medium text-gray-700"
@@ -150,24 +321,11 @@
                     <thedropdwon
                       id="card_id"
                       name="card_id"
+                      iconName="x"
                       :placeholder="$t('my-cards')"
                       v-model="order_form.card_id"
                       :errors="errors.length!==0 ? true : false"
                       :options="cardList"></thedropdwon>
-<!--                    <div class="relative w-full">-->
-<!--                      <select-->
-<!--                        class="bg-white w-full text-gray-500 border rounded-lg border-gray-200 py-2.5 pr-2 pl-11 text-base h-12 outline-orange-600"-->
-<!--                        id="payment_type"-->
-<!--                        :class="errors.length ? 'border-red-500 border-2' : ''"-->
-<!--                        name="payment_typee"-->
-<!--                        v-model="order_form.card_id"-->
-<!--                        style="-webkit-appearance: none;"-->
-<!--                      >-->
-<!--                        <option v-for="(item, ind) in cardList" :key="ind" :value="item.value">{{ item.label }}</option>-->
-<!--                      </select>-->
-<!--                      <img class="absolute position" src="../../../assets/svg/cash.svg" alt="Input icon">-->
-<!--                      <img class="absolute position-rigth" src="../../../assets/svg/arrow-bottom.svg" alt="Arrow icon">-->
-<!--                    </div>-->
                     <div class="map-card" @click="addCardModalOpen">
                       <the-icon src="plus"/>
                     </div>
@@ -177,7 +335,6 @@
             </div>
 
           </div>
-<!--          delivery_time-->
           <div class="px-3 pt-5 flex xl:justify-between justify-center gap-4 lg:flex-nowrap flex-wrap">
             <div class="flex items-center justify-between sm:w-96 w-80 input-400">
               <ValidationProvider
@@ -194,6 +351,7 @@
                   <thedropdwon
                     id="delivery_time"
                     name="delivery_time"
+                    iconName="x"
                     selected
                     :placeholder="'13:00 -14:00'"
                     v-model="order_form.delivery_time"
@@ -221,7 +379,7 @@
 
           </div>
 
-          <!--          prices-->
+
           <div class="sm:w-96 w-full items-end xl:m-0 -mx-0 mt-5">
             <h3 class="text-lg font-semibold text-gray-700">{{ $t('to-pay') }}</h3>
             <div class="rounded-lg p-3 total_summ -mx-0 mt-2">
@@ -237,20 +395,21 @@
               <div class="flex justify-between">
                 <h4 class="font-bold text-gray-600">{{ $t('total') }}</h4>
                 <h4 v-if="getCartItems?.delivery_price !== null" class="font-bold text-gray-600">
-                  {{ formatPrice(getCartItems) + (del_price > 0 ? del_price : 9000) }} {{ $t('sum') }}</h4>
-                <!--            <h4 v-else class="font-bold text-gray-600">{{Number(getCartItems.total_price)+10000 +"+" }} {{$t('sum')}}</h4>-->
+                  {{ formatPrice(getCartItems) + (del_price > 0 ? del_price : 9000) }} {{ $t('sum') }}
+                </h4>
               </div>
             </div>
           </div>
-          <button type="submit"
-                  class="w-full  h-12 rounded-3xl   mt-12 cursor-pointer"
-                  :class="{'bg-orange-600 text-white':!invalid,'text-gray-400 font-semibold bg-gray-300': invalid }"
+          <button 
+            type="submit"
+            class="w-full  h-12 rounded-3xl mt-12 cursor-pointer"
+            :class="{'bg-orange-600 text-white':!invalid,'text-gray-400 font-semibold bg-gray-300': invalid }"
           >
             {{ $t('pay') }}
           </button>
         </form>
       </ValidationObserver>
-      <!--      my order list -->
+
       <div class="bg-white xl:w-80 w-full rounded-2xl px-2 py-4 flex flex-col gap-3 shrink-0">
         <h2 class="font-semibold text-gray-800 text-2xl mx-2">{{ $t('your-order') }}</h2>
         <div class="flex flex-col gap-3 overflow-y-scroll scroll-style pl-2 pr-4" style="max-height: 516px;">
@@ -270,8 +429,6 @@
         </div>
       </div>
     </div>
-<!--    <div class="flex justify-center">-->
-<!--    </div>-->
     <order-yandex-maps :is-maps="$store.state.mapOrder" :set-is-maps="setIsMaps"
                        @changePlice="changePlice"></order-yandex-maps>
     <cards-form-modal :fetach="getMyCard"/>
@@ -319,6 +476,16 @@ export default {
         dish_items: [],
 
       },
+      options_later: [
+        {
+          label: this.$t('urgently-order'),
+          value: true
+        },
+        {
+          label: this.$t('usually-order'),
+          value: false
+        }
+      ],
       isDateNow: false,
       severTime: null,
       vendorWorktime: null,
@@ -689,8 +856,8 @@ export default {
   background: #FFFFFF;
   box-shadow: -3px -2px 20px -10px rgba(0, 0, 0, 0.19), 0px 4px 7px -1px rgba(0, 0, 0, 0.05);
   border-radius: 8px;
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: center;
