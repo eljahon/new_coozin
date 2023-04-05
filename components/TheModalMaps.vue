@@ -1,11 +1,10 @@
-
 <template>
-  <div v-if="$route.query.maps === 'maps'">
+  <div v-if="isOpened">
     <div class="multiple-modal 1">
       <span class="flex flex-col mb-2">
         <div class="flex items-center justify-between mb-3">
           <h2>{{$t('delivery-address')}}</h2>
-          <span @click="$routePush({...$route.query,maps: undefined})">
+          <span @click="setOpened">
             <the-icon
               class="cursor-pointer"
               src="x"
@@ -53,7 +52,7 @@
       <yandex-maps v-if="isMapRender" @clickPlace="locationNames" :marker-icon="markerIcon"></yandex-maps>
     </div>
     <div class="modal-background 1"
-         @click="$routePush({...$route.query, maps: undefined})">
+         @click="setOpened">
     </div>
   </div>
 </template>
@@ -64,6 +63,7 @@ import debounce from 'lodash.debounce'
 
 export default {
   name: "TheMaps",
+  props: ['isOpened', 'setOpened'],
   directives: {
     debounce,
   },
@@ -119,11 +119,9 @@ export default {
     },
     closedMap() {
       if (this.$route.path === '/'||this.$route.path === '/uz/' && this.markerIcon.length) {
-        this.$routePush({...this.$route.query,maps: undefined, lat:this.markerIcon[0], long: this.markerIcon[1]})
+        this.$routePush({...this.$route.query, lat:this.markerIcon[0], long: this.markerIcon[1]})
       }
-      else {
-        this.$routePush({...this.$route.query, maps: undefined})
-      }
+      this.setOpened()
     },
     close () {
       this.searchList = []
@@ -163,7 +161,7 @@ export default {
 
 .multiple-modal > div {
   overflow: hidden;
-  height: 86%;
+  height: 80%;
 }
 
 .ymaps-2-1-79-map {

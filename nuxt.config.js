@@ -35,7 +35,7 @@ export default {
   plugins: [
     { src: "~/plugins/axios.js" },
     { src: '@/plugins/yandex.js', ssr: false},
-    {src: '~/plugins/vee-validate.js', ssr: false},
+    { src: '~/plugins/vee-validate.js', ssr: false },
     { src: "~/plugins/tools.js", defer: true },
     { src: '@/plugins/routerPusher.js'},
     {src: '~/plugins/bridge.js'},

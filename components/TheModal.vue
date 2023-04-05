@@ -371,7 +371,7 @@ export default {
   z-index: 9;
   display: flex;
   flex-direction: column;
-  top: 80px;
+  top: 0;
   right: -400px;
   bottom: 0;
   padding: 24px;
@@ -476,7 +476,6 @@ export default {
 
 @media screen and (max-width: 640px) {
   .multiple-modal {
-    top: 72px;
     width: 375px;
     padding: 16px 10px;
   }

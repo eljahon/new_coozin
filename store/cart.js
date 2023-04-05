@@ -50,7 +50,7 @@ export const actions = {
       })
       const formatData = results.map((el, index) => {
         return {
-          total_price: el.order_items.reduce((acc, el) => acc + el.price, 0),
+          total_price: el.order_items.reduce((acc, el) => acc + (el.price*el.count), 0)+9000 +'+',
           full_name: el.vendor.user.first_name + " " + el.vendor.user.last_name,
           cart_id: el.id,
           cart_number: index + 1,

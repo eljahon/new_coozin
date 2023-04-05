@@ -12,13 +12,13 @@
           <div class="sm:block hidden">
             <the-logo />
           </div>
-          <div class="sm:hidden block w-28" :class="search ? 'hidden' : ''">
+          <div class="sm:hidden block w-28" addStyle="w-12" :class="search ? 'hidden' : ''">
             <the-logo />
           </div>
         </div>
         <div class="lg:flex hidden items-center gap-3">
           <div @click="search = !search">
-            <header-card>
+            <header-card addStyle="w-12">
               <the-icon :src="search ? 'x' : 'search'"/>
             </header-card>
           </div>
@@ -82,7 +82,7 @@
               @input="goToSearch"
             >
             <div @click="search = !search">
-              <header-card>
+              <header-card addStyle="w-12">
                 <the-icon :src="search ? 'x' : 'search'"/>
               </header-card>
             </div>
@@ -142,7 +142,7 @@
 
     <!--  Order Modal  -->
     <the-modal />
-    <the-modal-maps @changePlice="changePlace"/>
+    <the-modal-maps :setOpened="openModalYandexMpas" :isOpened="modal" @changePlice="changePlace"/>
     <burger-menu />
   </div>
 </template>
@@ -227,8 +227,7 @@ export default {
       // window.navigator.geolocation.getCurrentPosition(this.showLocations)
     },
     openModalYandexMpas () {
-      this.modal = false;
-      this.$routePush({...this.$route.query,maps: 'maps', login: undefined, register: undefined})
+      this.modal = !this.modal
     },
     changePlace(listPlice) {
       this.address = listPlice.fullName;
@@ -297,8 +296,6 @@ try {
 
 <style scoped>
 .header {
-  position: relative;
-  z-index: 10;
   background: #ffffff;
 }
 
