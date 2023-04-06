@@ -21,7 +21,7 @@ export default {
       }
     ],
   },
-  target: 'server',
+  target: 'static',
   env: {
     baseUrl: process.env.BASE_URL || 'https://backend.coozin.uz/api/'
   },
