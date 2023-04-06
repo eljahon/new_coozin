@@ -21,7 +21,10 @@ export default {
       }
     ],
   },
-  target: 'static',
+  server: {
+    port: 4000 // Default: 3000
+  },
+  // target: 'static',
   env: {
     baseUrl: process.env.BASE_URL || 'https://backend.coozin.uz/api/'
   },
