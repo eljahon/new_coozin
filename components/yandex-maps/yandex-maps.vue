@@ -2,7 +2,7 @@
   <div>
 <!--    <client-only>-->
 
-    <div id="map-wrap" style="height:80vh" class="w-full h-full">
+    <div id="map-wrap" style="height:40vh" class="w-full h-1/2">
 <!--      <no-ssr>-->
         <yandex-map
           v-if="showMap"

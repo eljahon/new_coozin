@@ -118,7 +118,9 @@
         </button>
         <br>
         <!--        <yandex-maps v-if="coor[0] !== null " :marker-icon="coor"/>-->
-        <yandex-maps/>
+        <div style="height: 30%">
+          <yandex-maps />
+        </div>
       </div>
 
       <!--      <div class="container mx-auto overflow-x-scroll scroll-style my-7">-->
